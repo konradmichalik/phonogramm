@@ -24,4 +24,19 @@ describe('folgenSchema', () => {
       }),
     ).toThrow()
   })
+
+  it('akzeptiert eine Folge mit skipLeadingTracks', () => {
+    const data = parseFolgenData({
+      folgen: [{ nummer: 239, titel: 'Spoiler-Folge', albumId: 'abc', skipLeadingTracks: 1 }],
+    })
+    expect(data.folgen[0].skipLeadingTracks).toBe(1)
+  })
+
+  it('lehnt negatives skipLeadingTracks ab', () => {
+    expect(() =>
+      parseFolgenData({
+        folgen: [{ nummer: 1, titel: 'X', albumId: 'a', skipLeadingTracks: -1 }],
+      }),
+    ).toThrow()
+  })
 })

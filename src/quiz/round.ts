@@ -21,14 +21,15 @@ const trackCache = new Map<string, Track[]>()
 
 async function loadTracks(deps: StartRoundDeps, albumId: string): Promise<Track[]> {
   const cached = trackCache.get(albumId)
-  if (cached !== undefined) {
-    if (cached.length === 0) throw new Error(`Keine Tracks für Album ${albumId}`)
-    return cached
-  }
+  if (cached !== undefined) return cached
   const tracks = await deps.getAlbumTracks(albumId, deps.token)
-  if (tracks.length === 0) throw new Error(`Keine Tracks für Album ${albumId}`)
   trackCache.set(albumId, tracks)
   return tracks
+}
+
+function playableTracks(folge: Folge, tracks: Track[]): Track[] {
+  const skip = Math.max(0, folge.skipLeadingTracks ?? 0)
+  return tracks.slice(skip)
 }
 
 export async function startRound(deps: StartRoundDeps): Promise<Round> {
@@ -39,8 +40,10 @@ export async function startRound(deps: StartRoundDeps): Promise<Round> {
     const folge = pickRandomFolge(deps.folgen, deps.rng, [...failed])
     try {
       const tracks = await loadTracks(deps, folge.albumId)
-      const positionMs = initialPosition({ mode: deps.mode, tracks, rng: deps.rng })
-      return { folge, tracks, positionMs }
+      const playable = playableTracks(folge, tracks)
+      if (playable.length === 0) throw new Error(`Keine Tracks für Album ${folge.albumId}`)
+      const positionMs = initialPosition({ mode: deps.mode, tracks: playable, rng: deps.rng })
+      return { folge, tracks: playable, positionMs }
     } catch (error) {
       lastError = error
       failed.add(folge.albumId)

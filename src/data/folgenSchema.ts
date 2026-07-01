@@ -5,6 +5,7 @@ const folgeSchema = z.object({
   nummer: z.number().int().min(1).max(999),
   titel: z.string().min(1),
   albumId: z.string().min(1),
+  skipLeadingTracks: z.number().int().min(0).optional(),
 })
 
 const folgenDataSchema = z.object({

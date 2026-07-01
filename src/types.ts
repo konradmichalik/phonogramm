@@ -4,6 +4,7 @@ export interface Folge {
   nummer: number
   titel: string
   albumId: string
+  skipLeadingTracks?: number
 }
 
 export interface FolgenData {

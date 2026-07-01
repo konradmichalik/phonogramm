@@ -106,3 +106,59 @@ test('startRound überspringt Album mit leerer Tracklist und versucht die nächs
   expect(round.folge.albumId).toBe('empty-tracks-b')
   expect(round.tracks).toEqual(workingTracks)
 })
+
+test('startRound entfernt skipLeadingTracks führende Tracks (Spoiler-Inhaltsangabe)', async () => {
+  const skipFolgen: Folge[] = [{ nummer: 239, titel: 'Spoiler', albumId: 'skip-alb', skipLeadingTracks: 1 }]
+  const t0: Track = { uri: 'synopsis-t0', durationMs: 30000 }
+  const t1: Track = { uri: 't1', durationMs: 60000 }
+  const t2: Track = { uri: 't2', durationMs: 60000 }
+
+  const round = await startRound({
+    folgen: skipFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async () => [t0, t1, t2],
+    rng: () => 0,
+  })
+
+  expect(round.tracks).toEqual([t1, t2])
+  expect(round.positionMs).toBe(0) // mode 'start' -> initialPosition computed over sliced set
+})
+
+test('startRound lässt Tracks unverändert, wenn skipLeadingTracks fehlt', async () => {
+  const noSkipFolgen: Folge[] = [{ nummer: 1, titel: 'Kein Skip', albumId: 'no-skip-alb' }]
+  const tracks: Track[] = [{ uri: 't0', durationMs: 60000 }, { uri: 't1', durationMs: 60000 }]
+
+  const round = await startRound({
+    folgen: noSkipFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async () => tracks,
+    rng: () => 0,
+  })
+
+  expect(round.tracks).toEqual(tracks)
+})
+
+test('startRound behandelt skipLeadingTracks >= Trackanzahl als Ladefehler und versucht die nächste Folge', async () => {
+  const allSkippedFolgen: Folge[] = [
+    { nummer: 1, titel: 'Ganz geskippt', albumId: 'all-skipped-a', skipLeadingTracks: 5 },
+    { nummer: 2, titel: 'Works', albumId: 'all-skipped-b' },
+  ]
+  const skippedTracks: Track[] = [{ uri: 'skip-t0', durationMs: 30000 }]
+  const workingTracks: Track[] = [{ uri: 'ok-t0', durationMs: 60000 }]
+
+  const round = await startRound({
+    folgen: allSkippedFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async (albumId) => {
+      if (albumId === 'all-skipped-a') return skippedTracks
+      return workingTracks
+    },
+    rng: () => 0, // would pick 'all-skipped-a' first without resilience
+  })
+
+  expect(round.folge.albumId).toBe('all-skipped-b')
+  expect(round.tracks).toEqual(workingTracks)
+})

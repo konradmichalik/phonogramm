@@ -79,6 +79,10 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 - `introEndMs` (optional, pro Folge): Millisekunden-Zeitpunkt, an dem das Intro endet.
   Überschreibt den globalen `defaultIntroEndMs`-Wert für Modus 1 und kann bei Bedarf pro
   Folge feinjustiert werden, falls das Intro kürzer oder länger als üblich ist.
+- `skipLeadingTracks` (optional, Standard `0`): Entfernt die ersten N Tracks aus dem
+  spielbaren Zeitstrahl (betrifft beide Modi) — etwa eine „Inhaltsangabe"-Spur, die Folgennummer
+  und Titel bereits verrät. Den passenden Wert per Blick in die Tracklist des Albums bei
+  Spotify ermitteln.
 
 ## Deployment (GitHub Pages)
 
