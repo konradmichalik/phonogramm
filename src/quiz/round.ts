@@ -21,8 +21,12 @@ const trackCache = new Map<string, Track[]>()
 
 async function loadTracks(deps: StartRoundDeps, albumId: string): Promise<Track[]> {
   const cached = trackCache.get(albumId)
-  if (cached) return cached
+  if (cached !== undefined) {
+    if (cached.length === 0) throw new Error(`Keine Tracks für Album ${albumId}`)
+    return cached
+  }
   const tracks = await deps.getAlbumTracks(albumId, deps.token)
+  if (tracks.length === 0) throw new Error(`Keine Tracks für Album ${albumId}`)
   trackCache.set(albumId, tracks)
   return tracks
 }

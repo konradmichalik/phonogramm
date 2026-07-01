@@ -84,3 +84,25 @@ test('startRound wirft, wenn alle Folgen fehlschlagen, mit dem letzten Fehlertex
     }),
   ).rejects.toThrow(/\(404\)/)
 })
+
+test('startRound überspringt Album mit leerer Tracklist und versucht die nächste Folge', async () => {
+  const emptyTracksFolgen: Folge[] = [
+    { nummer: 1, titel: 'Empty', albumId: 'empty-tracks-a' },
+    { nummer: 2, titel: 'Works', albumId: 'empty-tracks-b' },
+  ]
+  const workingTracks: Track[] = [{ uri: 'ok-t0', durationMs: 60000 }]
+
+  const round = await startRound({
+    folgen: emptyTracksFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async (albumId) => {
+      if (albumId === 'empty-tracks-a') return [] // Empty tracklist
+      return workingTracks
+    },
+    rng: () => 0, // would pick 'empty-tracks-a' first without resilience
+  })
+
+  expect(round.folge.albumId).toBe('empty-tracks-b')
+  expect(round.tracks).toEqual(workingTracks)
+})
