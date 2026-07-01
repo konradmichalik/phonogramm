@@ -1,11 +1,11 @@
 # 🎧 Hörspiel-Quiz
 
-Ein browserbasiertes Quiz für Hörspielfans: Es spielt einen exakten 5-Sekunden-Ausschnitt
+Ein browserbasiertes Quiz für Hörspielfans: Es spielt einen exakten 10-Sekunden-Ausschnitt
 aus einer Folge und du musst erraten, um welche Folge es sich handelt.
 
 Die Wiedergabe läuft über **Spotify Connect** — die Web-App selbst spielt keinen Ton,
 sondern steuert deine bereits geöffnete Spotify-App fern (als aktives Connect-Gerät),
-spielt den Ausschnitt exakt 5 Sekunden lang ab und pausiert danach automatisch wieder.
+spielt den Ausschnitt exakt 10 Sekunden lang ab und pausiert danach automatisch wieder.
 
 ## Voraussetzungen
 

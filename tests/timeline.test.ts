@@ -1,4 +1,5 @@
 import { totalDurationMs, initialPosition, scrub, positionToClip, introEndMs } from '../src/quiz/timeline'
+import { CLIP_MS } from '../src/types'
 import type { Track } from '../src/types'
 
 const A: Track[] = [
@@ -37,9 +38,9 @@ test('initialPosition start: nutzt startOffsetMs, wenn Timeline lang genug ist',
 })
 
 test('initialPosition start: klemmt startOffsetMs auf total - CLIP_MS, wenn zu groß', () => {
-  const shortTracks: Track[] = [{ uri: 's0', durationMs: 10000 }]
-  // total=10000, CLIP_MS=5000 -> max allowed offset = 5000
-  expect(initialPosition({ mode: 'start', tracks: shortTracks, startOffsetMs: 42000 })).toBe(5000)
+  const shortTracks: Track[] = [{ uri: 's0', durationMs: 20000 }]
+  // total=20000, CLIP_MS=10000 -> max allowed offset = 10000
+  expect(initialPosition({ mode: 'start', tracks: shortTracks, startOffsetMs: 42000 })).toBe(totalDurationMs(shortTracks) - CLIP_MS)
 })
 
 test('initialPosition random: untere Grenze bei rng=0', () => {
@@ -69,7 +70,8 @@ test('scrub: bewegt rückwärts', () => {
 })
 
 test('scrub: klemmt am oberen Rand (total - CLIP_MS)', () => {
-  expect(scrub(325000, 10000, A)).toBe(325000)
+  const maxPosition = totalDurationMs(A) - CLIP_MS
+  expect(scrub(maxPosition, 10000, A)).toBe(maxPosition)
 })
 
 test('positionToClip: Start des ersten Tracks', () => {

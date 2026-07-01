@@ -336,7 +336,7 @@ button svg { flex: 0 0 auto; }
   margin: 4px 0 0;
 }
 
-/* Progress bar — thin (4px) SOLID BLUE fill over the 5s clip */
+/* Progress bar — thin (4px) SOLID BLUE fill over the clip length (--clip-ms) */
 .player__progress {
   position: relative;
   width: 100%;
@@ -352,10 +352,11 @@ button svg { flex: 0 0 auto; }
   background: var(--blue);
   transform-origin: left center;
 }
-/* Restart-on-play: JS removes .is-playing, forces reflow, re-adds it. */
+/* Restart-on-play: JS removes .is-playing, forces reflow, re-adds it.
+   Duration comes from the --clip-ms custom property, set by app.ts from
+   CLIP_MS (src/types.ts) — stays in sync if CLIP_MS changes again. */
 .player.is-playing .player__bar {
-  /* 5s matches CLIP_MS (5000ms) in src/types.ts */
-  animation: hq-progress 5s linear forwards;
+  animation: hq-progress var(--clip-ms, 10s) linear forwards;
 }
 @keyframes hq-progress {
   from { width: 0; }
@@ -387,8 +388,7 @@ button svg { flex: 0 0 auto; }
 }
 .controls button:hover { color: var(--white); }
 .controls .scrub-icon { display: block; }
-.controls #back10:hover, .controls #back5:hover { color: var(--blue); }
-.controls #fwd5:hover, .controls #fwd10:hover { color: var(--blue); }
+.controls #back10:hover, .controls #fwd10:hover { color: var(--blue); }
 
 /* Big play button — full-width solid red, triangle icon */
 #play {

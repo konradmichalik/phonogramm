@@ -21,4 +21,4 @@ export interface ClipPosition {
   positionMs: number
 }
 
-export const CLIP_MS = 5000
+export const CLIP_MS = 10000

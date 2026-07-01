@@ -8,6 +8,7 @@ import { evaluateAnswer } from '../quiz/quizLogic'
 import { positionToClip, scrub } from '../quiz/timeline'
 import { validateGuess } from '../quiz/validateGuess'
 import { getClientId, getMode, setClientId, setMode } from '../state/settings'
+import { CLIP_MS } from '../types'
 import { render, setStatus } from './render'
 
 const data = parseFolgenData(folgenJson)
@@ -105,7 +106,7 @@ function renderStart(): void {
       </div>
       <span class="hq-tag" aria-hidden="true">Fall: 001</span>
     </div>
-    <p class="hq-sub">Untersuche die Fälle. Errate die Folge am 5-Sekunden-Ausschnitt.</p>
+    <p class="hq-sub">Untersuche die Fälle. Errate die Folge am 10-Sekunden-Ausschnitt.</p>
     <div class="stack">
       <button type="button" id="start">Neues Quiz ${ICON_ARROW}</button>
       <button type="button" class="secondary" id="settings">${ICON_GEAR} Einstellungen</button>
@@ -214,8 +215,6 @@ async function renderQuiz(): Promise<void> {
       </div>
       <div class="controls">
         <button type="button" id="back10" aria-label="10 Sekunden zurück">${ICON_REWIND('10')}<span>−10s</span></button>
-        <button type="button" id="back5" aria-label="5 Sekunden zurück">${ICON_REWIND('5')}<span>−5s</span></button>
-        <button type="button" id="fwd5" aria-label="5 Sekunden vor">${ICON_FORWARD('5')}<span>+5s</span></button>
         <button type="button" id="fwd10" aria-label="10 Sekunden vor">${ICON_FORWARD('10')}<span>+10s</span></button>
       </div>
       <button type="button" id="play"><span class="play-tri" aria-hidden="true"></span> Abspielen</button>
@@ -238,8 +237,6 @@ async function renderQuiz(): Promise<void> {
 
   root.querySelector('#play')!.addEventListener('click', () => void playCurrentClip())
   root.querySelector('#back10')!.addEventListener('click', () => void scrubAndPlay(-10000))
-  root.querySelector('#back5')!.addEventListener('click', () => void scrubAndPlay(-5000))
-  root.querySelector('#fwd5')!.addEventListener('click', () => void scrubAndPlay(5000))
   root.querySelector('#fwd10')!.addEventListener('click', () => void scrubAndPlay(10000))
   root.querySelector('#skip')!.addEventListener('click', () => void skipToOtherFolge())
   root.querySelector('#check')!.addEventListener('click', checkAnswer)
@@ -261,7 +258,9 @@ function triggerProgress(): void {
   const player = root.querySelector<HTMLElement>('#player')
   if (!player) return
   // Restart the CSS animation on every play: remove → reflow → re-add.
-  // The fill animates 0→100% over 5s (matches CLIP_MS = 5000ms in ../types).
+  // The fill duration is driven by --clip-ms (set from CLIP_MS in ../types),
+  // so it always matches the actual clip length regardless of CLIP_MS's value.
+  player.style.setProperty('--clip-ms', `${CLIP_MS}ms`)
   player.classList.remove('is-playing')
   void player.offsetWidth
   player.classList.add('is-playing')

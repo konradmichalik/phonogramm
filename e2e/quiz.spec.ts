@@ -35,7 +35,7 @@ test('Quiz-Flow mit gemocktem Spotify: abspielen, scrubben, prüfen', async ({ p
   await playRequest
 
   const fwdPlayRequest = page.waitForRequest('**/v1/me/player/play**')
-  await page.click('#fwd5')
+  await page.click('#fwd10')
   await fwdPlayRequest
 
   await page.fill('#guess', '125')
