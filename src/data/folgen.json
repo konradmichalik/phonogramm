@@ -1,7 +1,1240 @@
 {
   "folgen": [
-    { "nummer": 239, "titel": "Das Geheimnis der sieben Palmen", "albumId": "2mh0BDhRAJFa7clABwut3L", "skipLeadingTracks": 1 },
-    { "nummer": 157, "titel": "Im Zeichen der Schlangen", "albumId": "0pdXEEgKjfh4H0aZg4IOTS" },
-    { "nummer": 100, "titel": "Toteninsel", "albumId": "6zwBnyiy9Hy9TAser0DOuL" }
+    {
+      "nummer": 1,
+      "titel": "und der Super-Papagei",
+      "albumId": "4N9tvSjWfZXx3eHKblYEWQ"
+    },
+    {
+      "nummer": 2,
+      "titel": "und der Phantomsee",
+      "albumId": "0xldqK4Ocdt8dwQSxUzt6x"
+    },
+    {
+      "nummer": 3,
+      "titel": "und der Karpatenhund",
+      "albumId": "61OtrnMm1lqoMgMRb1aw7g"
+    },
+    {
+      "nummer": 4,
+      "titel": "und die schwarze Katze",
+      "albumId": "2w902iYtkf0ipmTImyLlsL"
+    },
+    {
+      "nummer": 5,
+      "titel": "und der Fluch des Rubins",
+      "albumId": "5YWM39RnabpxekZuHriTam"
+    },
+    {
+      "nummer": 6,
+      "titel": "und der sprechende Totenkopf",
+      "albumId": "54eP8BYMR270sTqklv83V0"
+    },
+    {
+      "nummer": 7,
+      "titel": "und der unheimliche Drache",
+      "albumId": "3nGyW4ETDrDpInYEAQCyYS"
+    },
+    {
+      "nummer": 8,
+      "titel": "und der grüne Geist",
+      "albumId": "6MRsf5IcfqJIogaNqtESnh"
+    },
+    {
+      "nummer": 9,
+      "titel": "und die rätselhaften Bilder",
+      "albumId": "0aNqdp5ayuUNsOdUwu8x0b"
+    },
+    {
+      "nummer": 10,
+      "titel": "und die flüsternde Mumie",
+      "albumId": "4h75QQIxW1etThTuw6vWzg"
+    },
+    {
+      "nummer": 11,
+      "titel": "und das Gespensterschloss",
+      "albumId": "07EhJ6uxWcQQWKeXJ1e8Lb"
+    },
+    {
+      "nummer": 12,
+      "titel": "und der seltsame Wecker",
+      "albumId": "0bSrvyOjOzFoFJfx3uaFgk"
+    },
+    {
+      "nummer": 13,
+      "titel": "und der lachende Schatten",
+      "albumId": "2AZ7zFBophWEIuBPjAG60I"
+    },
+    {
+      "nummer": 14,
+      "titel": "und das Bergmonster",
+      "albumId": "3O5STjjugoL5cNKfeRuBiU"
+    },
+    {
+      "nummer": 15,
+      "titel": "und der rasende Löwe",
+      "albumId": "2dQYcaTRh5qEYk2oH7WoBC"
+    },
+    {
+      "nummer": 16,
+      "titel": "und der Zauberspiegel",
+      "albumId": "16dOhg07DVqoSxlS7ToLM5"
+    },
+    {
+      "nummer": 17,
+      "titel": "und die gefährliche Erbschaft",
+      "albumId": "0CMsNalUakIcv6znyVLALr"
+    },
+    {
+      "nummer": 18,
+      "titel": "und die Geisterinsel",
+      "albumId": "1yqICFWBL4l7fJkrFWvfWL"
+    },
+    {
+      "nummer": 19,
+      "titel": "und der Teufelsberg",
+      "albumId": "3JqJ2zIt3UzKug7onmbmAo"
+    },
+    {
+      "nummer": 20,
+      "titel": "und die flammende Spur",
+      "albumId": "5ilbdbGu5eQRUIsbslyiLe"
+    },
+    {
+      "nummer": 21,
+      "titel": "und der tanzende Teufel",
+      "albumId": "2koZEkq7vQnHjMP73gVXCo"
+    },
+    {
+      "nummer": 22,
+      "titel": "und der verschwundene Schatz",
+      "albumId": "7i50aK2wKvszWNnay4DtxP"
+    },
+    {
+      "nummer": 23,
+      "titel": "und das Aztekenschwert",
+      "albumId": "67qFOAxbhNRHEIeOjQ9Zkp"
+    },
+    {
+      "nummer": 24,
+      "titel": "und die silberne Spinne",
+      "albumId": "211IEWHi59nUsHx8li8G9r"
+    },
+    {
+      "nummer": 25,
+      "titel": "und die singende Schlange",
+      "albumId": "6RXr8BmKNSK9Zk11k0I7Dl"
+    },
+    {
+      "nummer": 26,
+      "titel": "und die Silbermine",
+      "albumId": "2NSreywe8UbWo7BJVY3Spk"
+    },
+    {
+      "nummer": 27,
+      "titel": "und der magische Kreis",
+      "albumId": "2AisAUu4deLpNi6g6qlTLC"
+    },
+    {
+      "nummer": 28,
+      "titel": "und der Doppelgänger",
+      "albumId": "7Dbd2rya9glmBLVxclcU4d"
+    },
+    {
+      "nummer": 29,
+      "titel": "Die Originalmusik",
+      "albumId": "5JHijjtr65MjdNOnNvD3Ec"
+    },
+    {
+      "nummer": 30,
+      "titel": "und das Riff der Haie",
+      "albumId": "0zV9pnaXLuogDr6prsvb4M"
+    },
+    {
+      "nummer": 31,
+      "titel": "und das Narbengesicht",
+      "albumId": "0tPetsUWuZIC0E85x6eVN5"
+    },
+    {
+      "nummer": 32,
+      "titel": "und der Ameisenmensch",
+      "albumId": "7K3VEzD1rm0dgUGBi1i5PW"
+    },
+    {
+      "nummer": 33,
+      "titel": "und die bedrohte Ranch",
+      "albumId": "1imKVIfJIM0vKNymevqKjP"
+    },
+    {
+      "nummer": 34,
+      "titel": "und der rote Pirat",
+      "albumId": "2L18qTB1EfS4FuBk2M6QwV"
+    },
+    {
+      "nummer": 35,
+      "titel": "und der Höhlenmensch",
+      "albumId": "2REEfC6tVMiYv1eKMlGiOX"
+    },
+    {
+      "nummer": 36,
+      "titel": "und der Super-Wal",
+      "albumId": "4R24oyyqxGkczNpqWGCXBZ"
+    },
+    {
+      "nummer": 37,
+      "titel": "und der heimliche Hehler",
+      "albumId": "6R4gnRHXKgw2cxneWgTiEL"
+    },
+    {
+      "nummer": 38,
+      "titel": "und der unsichtbare Gegner",
+      "albumId": "6d3Pavm0enVICdOvBEqxYA"
+    },
+    {
+      "nummer": 39,
+      "titel": "und die Perlenvögel",
+      "albumId": "0AKPkUh4ElyZNipc0lZoiR"
+    },
+    {
+      "nummer": 40,
+      "titel": "und der Automarder",
+      "albumId": "2IIw1KESZrJQBFdZQAWcKY"
+    },
+    {
+      "nummer": 41,
+      "titel": "und das Volk der Winde",
+      "albumId": "5KUXX8H2LNsuik46M5XLx0"
+    },
+    {
+      "nummer": 42,
+      "titel": "und der weinende Sarg",
+      "albumId": "24bba3w45LGGm7ps3qonkc"
+    },
+    {
+      "nummer": 43,
+      "titel": "und der höllische Werwolf",
+      "albumId": "48QVzskevXtA0KpJjXzvb1"
+    },
+    {
+      "nummer": 44,
+      "titel": "und der gestohlene Preis",
+      "albumId": "6JNNLdq9ELeKENK3RmxLWQ"
+    },
+    {
+      "nummer": 45,
+      "titel": "und das Gold der Wikinger",
+      "albumId": "39mWWzaUZp0AXyN9Vnp4od"
+    },
+    {
+      "nummer": 46,
+      "titel": "und der schrullige Millionär",
+      "albumId": "6YX4i7aMCYmn20zvAFM3lG"
+    },
+    {
+      "nummer": 47,
+      "titel": "und der giftige Gockel",
+      "albumId": "3iWNsrEs9D0FFlKFfscdvL"
+    },
+    {
+      "nummer": 48,
+      "titel": "und die gefährlichen Fässer",
+      "albumId": "5IRxm1lo35PttzU8YLslZy"
+    },
+    {
+      "nummer": 49,
+      "titel": "und die Comic-Diebe",
+      "albumId": "7t2SteAH5OnLLC1ghTAmka"
+    },
+    {
+      "nummer": 50,
+      "titel": "und der verschwundene Filmstar",
+      "albumId": "6DKfjDIB1BSYRGAi2YJYm3"
+    },
+    {
+      "nummer": 51,
+      "titel": "und der riskante Ritt",
+      "albumId": "71kiy6INV3LzsCddpTZoHf"
+    },
+    {
+      "nummer": 52,
+      "titel": "und die Musikpiraten",
+      "albumId": "3pXJh2A9gYzNt22rEIE5q7"
+    },
+    {
+      "nummer": 53,
+      "titel": "und die Automafia",
+      "albumId": "0F9ebKwTd5RNZZOu49lWuF"
+    },
+    {
+      "nummer": 54,
+      "titel": "Gefahr im Verzug",
+      "albumId": "1Fg15cBLFliy6Kr60QqRan"
+    },
+    {
+      "nummer": 55,
+      "titel": "Gekaufte Spieler",
+      "albumId": "4oH2GUWlSSsSgVkxyPVHX1"
+    },
+    {
+      "nummer": 56,
+      "titel": "Angriff der Computer-Viren",
+      "albumId": "3fotka2Hbq0N7V9KKWIDdw"
+    },
+    {
+      "nummer": 57,
+      "titel": "Tatort Zirkus",
+      "albumId": "5W6dRiaeSVE7zUBYHbepak"
+    },
+    {
+      "nummer": 58,
+      "titel": "und der verrückte Maler",
+      "albumId": "6DWykdlgf60Mq02hPAGYVD"
+    },
+    {
+      "nummer": 59,
+      "titel": "Giftiges Wasser",
+      "albumId": "2qcA1EqAoUsqxXqIivY6Zc"
+    },
+    {
+      "nummer": 60,
+      "titel": "Dopingmixer",
+      "albumId": "7cBoiWgh1bTMZmCwJE0eMu"
+    },
+    {
+      "nummer": 61,
+      "titel": "und die Rache des Tigers",
+      "albumId": "26M4ktHp3isOX6XJazAxPn"
+    },
+    {
+      "nummer": 62,
+      "titel": "Spuk im Hotel",
+      "albumId": "0biXUv1uGUaVsPcw8nAZCY"
+    },
+    {
+      "nummer": 63,
+      "titel": "Fußball-Gangster",
+      "albumId": "5GPTZKrD7eaCp9p6VOBuIN"
+    },
+    {
+      "nummer": 64,
+      "titel": "Geisterstadt",
+      "albumId": "0tmMvsGyWRzVckCYgkvve3"
+    },
+    {
+      "nummer": 65,
+      "titel": "Diamantenschmuggel",
+      "albumId": "62z7yW4RKhhuAp0RklmNvc"
+    },
+    {
+      "nummer": 66,
+      "titel": "und die Schattenmänner",
+      "albumId": "6qj4LD0zotutkIgEg9OvDj"
+    },
+    {
+      "nummer": 67,
+      "titel": "und das Geheimnis der Särge",
+      "albumId": "7Hjk98j1FSrHV5IHWmeeFh"
+    },
+    {
+      "nummer": 68,
+      "titel": "und der Schatz im Bergsee",
+      "albumId": "21pUsEhxssm6fvumGFmi35"
+    },
+    {
+      "nummer": 69,
+      "titel": "Späte Rache",
+      "albumId": "2erJcBofKBO6GFMqDPppsU"
+    },
+    {
+      "nummer": 70,
+      "titel": "Schüsse aus dem Dunkel",
+      "albumId": "4mlQEwk6I0XuksZCYTtatz"
+    },
+    {
+      "nummer": 71,
+      "titel": "Die verschwundene Seglerin",
+      "albumId": "6EEN6onzbHIOxnwUkGfKhv"
+    },
+    {
+      "nummer": 72,
+      "titel": "Dreckiger Deal",
+      "albumId": "2GQjkF0ceIse6jVZkUuAQc"
+    },
+    {
+      "nummer": 73,
+      "titel": "Poltergeist",
+      "albumId": "1K8kXLhNnHSdPvtUwf74DE"
+    },
+    {
+      "nummer": 74,
+      "titel": "und das brennende Schwert",
+      "albumId": "69VLqtWA1bpguYRCFRAxQl"
+    },
+    {
+      "nummer": 75,
+      "titel": "Die Spur des Raben",
+      "albumId": "2IqfdlQamN3vCWN3CKLEVI"
+    },
+    {
+      "nummer": 76,
+      "titel": "Stimmen aus dem Nichts",
+      "albumId": "6RDPGc2budsdTw1lj8f2O5"
+    },
+    {
+      "nummer": 77,
+      "titel": "Pistenteufel",
+      "albumId": "3CMN8Y4kjoG4sFwlOEpfsV"
+    },
+    {
+      "nummer": 78,
+      "titel": "Das leere Grab",
+      "albumId": "6t7Y1H4dUM0d4JycenVskN"
+    },
+    {
+      "nummer": 79,
+      "titel": "Im Bann des Voodoo",
+      "albumId": "1rDYlXZy6vN4wqqQ6buqOr"
+    },
+    {
+      "nummer": 80,
+      "titel": "Geheimakte Ufo",
+      "albumId": "4izXuApLzBWtWHrFqgcrxL"
+    },
+    {
+      "nummer": 81,
+      "titel": "Verdeckte Fouls",
+      "albumId": "2s5u6hCaMpTIvZtBRvQzha"
+    },
+    {
+      "nummer": 82,
+      "titel": "Die Karten des Bösen",
+      "albumId": "7iysTnwaaFrPPWAuUyyi0c"
+    },
+    {
+      "nummer": 83,
+      "titel": "Meuterei auf hoher See",
+      "albumId": "3yofHdHiOLtVZlxWCZ4XBB"
+    },
+    {
+      "nummer": 84,
+      "titel": "Musik des Teufels",
+      "albumId": "3bhsXwKIDwVK5LTkDCICp0"
+    },
+    {
+      "nummer": 85,
+      "titel": "Feuerturm",
+      "albumId": "2eeodcwD9HXpcA2rvoFkIq"
+    },
+    {
+      "nummer": 86,
+      "titel": "Nacht in Angst",
+      "albumId": "4uF9MjchYgq5jjPi5x5YZy"
+    },
+    {
+      "nummer": 87,
+      "titel": "Wolfsgesicht",
+      "albumId": "1KpWkUQaj5ECJsrb8SrPl4"
+    },
+    {
+      "nummer": 88,
+      "titel": "Vampir im Internet",
+      "albumId": "3CZCwdMpj2jnjI43ZlnY5T"
+    },
+    {
+      "nummer": 89,
+      "titel": "Tödliche Spur",
+      "albumId": "3TcIn19pVz5LXE8UleuLuX"
+    },
+    {
+      "nummer": 90,
+      "titel": "Der Feuerteufel",
+      "albumId": "2dlgtHB8z7ZhSl1fsSb0Ic"
+    },
+    {
+      "nummer": 91,
+      "titel": "Labyrinth der Götter",
+      "albumId": "0Jh7gzQaOscoFndb3raq2l"
+    },
+    {
+      "nummer": 92,
+      "titel": "Todesflug",
+      "albumId": "7yMRFgR8FRyWwiLHzQQa2B"
+    },
+    {
+      "nummer": 93,
+      "titel": "und das Geisterschiff",
+      "albumId": "7a9rwqPkVdU4FC2cWFudVO"
+    },
+    {
+      "nummer": 94,
+      "titel": "Das schwarze Monster",
+      "albumId": "3UHj03eU7OnDuMVCTLbmcj"
+    },
+    {
+      "nummer": 95,
+      "titel": "Botschaft von Geisterhand",
+      "albumId": "4KEZWleMTT8lDaQDLgozFc"
+    },
+    {
+      "nummer": 96,
+      "titel": "und der rote Rächer",
+      "albumId": "5ub4r9Q0YVMrWuOEesu6dR"
+    },
+    {
+      "nummer": 97,
+      "titel": "Insektenstachel",
+      "albumId": "2bfJa4PRKVb7as86HZv8Df"
+    },
+    {
+      "nummer": 98,
+      "titel": "Tal des Schreckens",
+      "albumId": "4C4o7tHpT20QrdsvmI70uI"
+    },
+    {
+      "nummer": 99,
+      "titel": "Rufmord",
+      "albumId": "3haGZZ8x7PyaGxiqcLmLf9"
+    },
+    {
+      "nummer": 100,
+      "titel": "Toteninsel",
+      "albumId": "6zwBnyiy9Hy9TAser0DOuL"
+    },
+    {
+      "nummer": 101,
+      "titel": "und das Hexen-Handy",
+      "albumId": "1DZAe0qMw8Pq9EPoX6gETA"
+    },
+    {
+      "nummer": 102,
+      "titel": "Doppelte Täuschung",
+      "albumId": "3NYWEuwAPt4PIJ4OeNxmzO"
+    },
+    {
+      "nummer": 103,
+      "titel": "Das Erbe des Meisterdiebes",
+      "albumId": "4ADdmpObDUmBdvyJ9oNz5o"
+    },
+    {
+      "nummer": 104,
+      "titel": "Gift per e-mail",
+      "albumId": "6joRNVLN69v3eSnxM86BSM"
+    },
+    {
+      "nummer": 105,
+      "titel": "Der Nebelberg",
+      "albumId": "6Mi4Smq7Fn8qNOg6Xnf0In"
+    },
+    {
+      "nummer": 106,
+      "titel": "Der Mann ohne Kopf",
+      "albumId": "4eX1wH67TDcYPZ1ZsjtPb6"
+    },
+    {
+      "nummer": 107,
+      "titel": "und der Schatz der Mönche",
+      "albumId": "3kBby5GJMI4U97XljKcPFD"
+    },
+    {
+      "nummer": 108,
+      "titel": "Die sieben Tore",
+      "albumId": "3v4W4AFaI8uO7J88ojaSkS"
+    },
+    {
+      "nummer": 109,
+      "titel": "Gefährliches Quiz",
+      "albumId": "4RZllDAKF3DeDz6jZJFXTa"
+    },
+    {
+      "nummer": 110,
+      "titel": "Panik im Park",
+      "albumId": "1OBHPhBUih26oQTqxLvJTQ"
+    },
+    {
+      "nummer": 111,
+      "titel": "Die Höhle des Grauens",
+      "albumId": "7b9OiVsktCZyldiAnjkVDx"
+    },
+    {
+      "nummer": 112,
+      "titel": "Schlucht der Dämonen",
+      "albumId": "0WBhXS0uAYuL1sYb6vjYeS"
+    },
+    {
+      "nummer": 113,
+      "titel": "Das Auge des Drachen",
+      "albumId": "3bFvjy9IyWd7GrzN2dr0Hi"
+    },
+    {
+      "nummer": 114,
+      "titel": "Die Villa der Toten",
+      "albumId": "5L2KCw21QT3JKg1KKuqSeF"
+    },
+    {
+      "nummer": 115,
+      "titel": "Auf tödlichem Kurs",
+      "albumId": "5Hafee7JOUqNVqtsrCtrTZ"
+    },
+    {
+      "nummer": 116,
+      "titel": "Codename: Cobra",
+      "albumId": "3piMnopGsrEAKd1EZxsU3i"
+    },
+    {
+      "nummer": 117,
+      "titel": "Der finstere Rivale",
+      "albumId": "3rxr4SLE2EG0EAlpSeI99o"
+    },
+    {
+      "nummer": 118,
+      "titel": "Das düstere Vermächtnis",
+      "albumId": "1GKXpMQRKEyZI8pL62VUIP"
+    },
+    {
+      "nummer": 119,
+      "titel": "Der geheime Schlüssel",
+      "albumId": "7rPDg8NlFJ1a2HMTQvVaB2"
+    },
+    {
+      "nummer": 120,
+      "titel": "Der schwarze Skorpion",
+      "albumId": "6fVTJQKJBku1yaOmZOnfwg"
+    },
+    {
+      "nummer": 121,
+      "titel": "Spur ins Nichts",
+      "albumId": "6d21lwV9Imn3ObWUyV1UN2"
+    },
+    {
+      "nummer": 122,
+      "titel": "und der Geisterzug",
+      "albumId": "68NWcgqeCQMZ3QcPJXBhzH"
+    },
+    {
+      "nummer": 123,
+      "titel": "Fußballfieber",
+      "albumId": "3HgetGSMzg6bGM6b67YZcj"
+    },
+    {
+      "nummer": 124,
+      "titel": "Geister-Canyon",
+      "albumId": "0LoesJ9VnJPrlvIDz4u4Xt"
+    },
+    {
+      "nummer": 125,
+      "titel": "Feuermond",
+      "albumId": "0sIRyuExi7jBQmOpHyyY78"
+    },
+    {
+      "nummer": 126,
+      "titel": "Schrecken aus dem Moor",
+      "albumId": "0AnyLaLPx339iGaxjqVfob"
+    },
+    {
+      "nummer": 127,
+      "titel": "Schwarze Madonna",
+      "albumId": "0mp5HVWlYinEYa7Y4Q2vau"
+    },
+    {
+      "nummer": 128,
+      "titel": "Schatten über Hollywood",
+      "albumId": "3XXYXmCEe185oHxigCRo97"
+    },
+    {
+      "nummer": 129,
+      "titel": "SMS aus dem Grab",
+      "albumId": "1lD4RdnibVS7QhtZqCal9E"
+    },
+    {
+      "nummer": 130,
+      "titel": "Der Fluch des Drachen",
+      "albumId": "5l5CFSjzSdhbflqmplcTFX"
+    },
+    {
+      "nummer": 131,
+      "titel": "Haus des Schreckens",
+      "albumId": "4eorcDi9eRfsi7X0A91Z7u"
+    },
+    {
+      "nummer": 132,
+      "titel": "Spuk im Netz",
+      "albumId": "23wcElHGWpunC23ggr4PcW"
+    },
+    {
+      "nummer": 133,
+      "titel": "Fels der Dämonen",
+      "albumId": "1juMQy6yZVmk9Za6HeiicB"
+    },
+    {
+      "nummer": 134,
+      "titel": "Der tote Mönch",
+      "albumId": "1Cta130Rwp5vH1ddfAChbU"
+    },
+    {
+      "nummer": 135,
+      "titel": "Fluch des Piraten",
+      "albumId": "0TmWLedytkxVuP9b5Hqeqq"
+    },
+    {
+      "nummer": 136,
+      "titel": "und das versunkene Dorf",
+      "albumId": "5HiWGQmaCRaxdaon49Iw9S"
+    },
+    {
+      "nummer": 137,
+      "titel": "Pfad der Angst",
+      "albumId": "3m7fR2wOkytZHq9m4QeBkB"
+    },
+    {
+      "nummer": 138,
+      "titel": "Die geheime Treppe",
+      "albumId": "79enDMGQWH7LQ5weNB96g7"
+    },
+    {
+      "nummer": 139,
+      "titel": "Das Geheimnis der Diva",
+      "albumId": "6RJf8I60kNhnYxlnw7eTGv"
+    },
+    {
+      "nummer": 140,
+      "titel": "Stadt der Vampire",
+      "albumId": "3HxAtK23R2gFkW000mdaFT"
+    },
+    {
+      "nummer": 141,
+      "titel": "und die Fußball-Falle",
+      "albumId": "6gxj68DOHRSVlEM4xzwtRy"
+    },
+    {
+      "nummer": 142,
+      "titel": "Tödliches Eis",
+      "albumId": "71moidSHTwJsc2N70axEce"
+    },
+    {
+      "nummer": 143,
+      "titel": "und die Poker-Hölle",
+      "albumId": "4Y7Pxv7pzLmKVJowmBwOkd"
+    },
+    {
+      "nummer": 144,
+      "titel": "Zwillinge der Finsternis",
+      "albumId": "2RxTF6MhAVOtudVNOyHTQz"
+    },
+    {
+      "nummer": 145,
+      "titel": "Die Rache der Samurai",
+      "albumId": "6TjzBTmeDakBgh5NOGj1BC"
+    },
+    {
+      "nummer": 146,
+      "titel": "Der Biss der Bestie",
+      "albumId": "3D9Jf4mdOBoeyrKpffYBvy"
+    },
+    {
+      "nummer": 147,
+      "titel": "Grusel auf Campbell Castle",
+      "albumId": "35aU9bfmxPGdjiRA4JMuFd"
+    },
+    {
+      "nummer": 148,
+      "titel": "und die feurige Flut",
+      "albumId": "2uOsf31oenHRd4DVxCSjn9"
+    },
+    {
+      "nummer": 149,
+      "titel": "Der namenlose Gegner",
+      "albumId": "7K7dfMc3VwHOKtENI1BWTD"
+    },
+    {
+      "nummer": 150,
+      "titel": "Geisterbucht",
+      "albumId": "6cPgVsZ6TPyVIP9BHP5ty5"
+    },
+    {
+      "nummer": 151,
+      "titel": "Schwarze Sonne",
+      "albumId": "3u0OSCwiOblOhm4dKjwLN5"
+    },
+    {
+      "nummer": 152,
+      "titel": "Skateboardfieber",
+      "albumId": "5iNeANVy4supl8HowB9V2h"
+    },
+    {
+      "nummer": 153,
+      "titel": "und das Fußballphantom",
+      "albumId": "7nxSEeJiQwI34VwnWT83C9"
+    },
+    {
+      "nummer": 154,
+      "titel": "Botschaft aus der Unterwelt",
+      "albumId": "3uggg8gNlh1kpBxLeOfFTV"
+    },
+    {
+      "nummer": 155,
+      "titel": "und der Meister des Todes",
+      "albumId": "623V90QowsF4WSqV3cHGKf"
+    },
+    {
+      "nummer": 156,
+      "titel": "Im Netz des Drachen",
+      "albumId": "78wUIvkGT2CdWW0ngeEy8V"
+    },
+    {
+      "nummer": 157,
+      "titel": "Im Zeichen der Schlangen",
+      "albumId": "0pdXEEgKjfh4H0aZg4IOTS"
+    },
+    {
+      "nummer": 158,
+      "titel": "und der Feuergeist",
+      "albumId": "3uFt95otJjaxH8o40tPtIS"
+    },
+    {
+      "nummer": 159,
+      "titel": "Nacht der Tiger",
+      "albumId": "4rCAnDrNJ96srnBEoA0ISj"
+    },
+    {
+      "nummer": 160,
+      "titel": "Geheimnisvolle Botschaften",
+      "albumId": "2F6VxgWbGCUpTU9ux6Dtbi"
+    },
+    {
+      "nummer": 161,
+      "titel": "Die blutenden Bilder",
+      "albumId": "1GEzdjI5N25iuGjvypRscs"
+    },
+    {
+      "nummer": 162,
+      "titel": "und der schreiende Nebel",
+      "albumId": "7beppYTqtHAEPKoXyodssF"
+    },
+    {
+      "nummer": 163,
+      "titel": "und der verschollene Pilot",
+      "albumId": "4fv0pPN7ZjbUiejSTxTPZh"
+    },
+    {
+      "nummer": 164,
+      "titel": "Fußball-Teufel",
+      "albumId": "3An657Q0wkVp4nIDg2zpcB"
+    },
+    {
+      "nummer": 165,
+      "titel": "Im Schatten des Giganten",
+      "albumId": "4izJKxYT4fTwIZjoXNgkX7"
+    },
+    {
+      "nummer": 166,
+      "titel": "und die brennende Stadt",
+      "albumId": "427kScPIeUSfoNKCNercMC"
+    },
+    {
+      "nummer": 167,
+      "titel": "und das blaue Biest",
+      "albumId": "7kskBahbrQWCOiaXKuoPjE"
+    },
+    {
+      "nummer": 168,
+      "titel": "GPS-Gangster",
+      "albumId": "77aawQqgLQZxPb9kwSg0JR"
+    },
+    {
+      "nummer": 169,
+      "titel": "Die Spur des Spielers",
+      "albumId": "5PEHeYcUhz1Aq02ZB1pUgJ"
+    },
+    {
+      "nummer": 170,
+      "titel": "Straße des Grauens",
+      "albumId": "62CKj2RCiWDDUtBWTn4KxQ"
+    },
+    {
+      "nummer": 171,
+      "titel": "und das Phantom aus dem Meer",
+      "albumId": "6YbaUGc6ZeR1YnDFGQJV8F"
+    },
+    {
+      "nummer": 172,
+      "titel": "und der Eisenmann",
+      "albumId": "6Anfub4AoVHg9bhJ7js0L0"
+    },
+    {
+      "nummer": 173,
+      "titel": "Dämon der Rache",
+      "albumId": "2ALDCHCHdawewN1sduWVQQ"
+    },
+    {
+      "nummer": 174,
+      "titel": "und das Tuch der Toten",
+      "albumId": "5RoL0jdWMoJ8KRFVOeFYtX"
+    },
+    {
+      "nummer": 175,
+      "titel": "Schattenwelt",
+      "albumId": "4uggmrJ3Xpm1e2tcz6laze"
+    },
+    {
+      "nummer": 176,
+      "titel": "und der gestohlene Sieg",
+      "albumId": "4qbxSVpr3NxRjdIVC411ue"
+    },
+    {
+      "nummer": 177,
+      "titel": "Der Geist des Goldgräbers",
+      "albumId": "0w6Khy7kpqTXrEDITf0rZ0"
+    },
+    {
+      "nummer": 178,
+      "titel": "Der gefiederte Schrecken",
+      "albumId": "3w5glP0mzKfTanzXpAjN27"
+    },
+    {
+      "nummer": 179,
+      "titel": "Die Rache des Untoten",
+      "albumId": "4IZ7Lsm5le7HJPtaGLCrjO"
+    },
+    {
+      "nummer": 180,
+      "titel": "und die flüsternden Puppen",
+      "albumId": "6tioH9PNiZbmUT54MsiX5k"
+    },
+    {
+      "nummer": 181,
+      "titel": "Das Kabinett des Zauberers",
+      "albumId": "18xyskqkEGnVfVFhznkFIK"
+    },
+    {
+      "nummer": 182,
+      "titel": "Im Haus des Henkers",
+      "albumId": "4zCPToY7AoTqvOKf4HRqAN"
+    },
+    {
+      "nummer": 183,
+      "titel": "und der letzte Song",
+      "albumId": "1qhlRmclvYWkrYkLnFxFZN"
+    },
+    {
+      "nummer": 184,
+      "titel": "und der Hexengarten",
+      "albumId": "5B7w9vkfh979tEyzwkLk9k"
+    },
+    {
+      "nummer": 185,
+      "titel": "und der Mann ohne Augen",
+      "albumId": "7eHh5PAxQBt5KBWzd3a10G"
+    },
+    {
+      "nummer": 186,
+      "titel": "Insel des Vergessens",
+      "albumId": "5kevid18ttcAPK1vk0kLtc"
+    },
+    {
+      "nummer": 187,
+      "titel": "und das silberne Amulett",
+      "albumId": "6uj8JeIgluMibSu8Divkbh"
+    },
+    {
+      "nummer": 188,
+      "titel": "Signale aus dem Jenseits",
+      "albumId": "22soWryC08ctyMNb6NrMGD"
+    },
+    {
+      "nummer": 189,
+      "titel": "und der unsichtbare Passagier",
+      "albumId": "02MXdFaVMz0qQJjmivjI8g"
+    },
+    {
+      "nummer": 190,
+      "titel": "und die Kammer der Rätsel",
+      "albumId": "100ZHoBX994GlckxjoGpma"
+    },
+    {
+      "nummer": 191,
+      "titel": "Verbrechen im Nichts",
+      "albumId": "2ICtKWqLqMBTzi7UeByhKd"
+    },
+    {
+      "nummer": 192,
+      "titel": "im Bann des Drachen",
+      "albumId": "1qag2AiFcxXU1UaIgrDFff"
+    },
+    {
+      "nummer": 193,
+      "titel": "Schrecken aus der Tiefe",
+      "albumId": "4m6VlVOWfrUVhWWrueMo7p"
+    },
+    {
+      "nummer": 194,
+      "titel": "und die Zeitreisende",
+      "albumId": "2oKngJQA5TdxF5QcP3uZEf"
+    },
+    {
+      "nummer": 195,
+      "titel": "Im Reich der Ungeheuer",
+      "albumId": "3pbXIzVk7CA5VM2ltxu9TN"
+    },
+    {
+      "nummer": 196,
+      "titel": "Geheimnis des Bauchredners",
+      "albumId": "39a7bHWZyWPxwukCHPrTly"
+    },
+    {
+      "nummer": 197,
+      "titel": "Im Auge des Sturms",
+      "albumId": "0GRoTtX1wI16M7GSnnN96R"
+    },
+    {
+      "nummer": 198,
+      "titel": "Die Legende der Gaukler",
+      "albumId": "4piiNuehCc4VjN8NBIcnRt"
+    },
+    {
+      "nummer": 199,
+      "titel": "und der grüne Kobold",
+      "albumId": "7bTKP2hU0LRks1bXN1R7ko",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 200,
+      "titel": "Feuriges Auge",
+      "albumId": "09Ckx1JLgPsQHHGuSIt2j3",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 201,
+      "titel": "Höhenangst",
+      "albumId": "4FxNfDSXqAg8N1D8NBtvZ5",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 202,
+      "titel": "Das weiße Grab",
+      "albumId": "4Exxckn0GwbhnGl6N4um2N",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 203,
+      "titel": "Tauchgang ins Ungewisse",
+      "albumId": "79Drf49yNdGLBzzHMGGmBz",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 204,
+      "titel": "Der dunkle Wächter",
+      "albumId": "1yMMjH3tDN9GyXiADzTkL9",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 205,
+      "titel": "Das rätselhafte Erbe",
+      "albumId": "2Sw9FBHOoT6fBhYxHsRFxq",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 206,
+      "titel": "und der Mottenmann",
+      "albumId": "7khAMIQlYBmW7mI9cphDhJ",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 207,
+      "titel": "Die falschen Detektive",
+      "albumId": "6BxvBG51szGmlg5x3F1rHj",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 208,
+      "titel": "Kelch des Schicksals",
+      "albumId": "6WgRUQY49NRG6JT6dJ4xEq",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 209,
+      "titel": "Kreaturen der Nacht",
+      "albumId": "0q4FbI22wSMrzgWh5vgHi9",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 210,
+      "titel": "und die schweigende Grotte",
+      "albumId": "3ieWqOL150wJOcft7iZHKZ",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 211,
+      "titel": "und der Jadekönig",
+      "albumId": "7pZotNNAYOkeHNvJRKzYRk",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 212,
+      "titel": "und der weiße Leopard",
+      "albumId": "2zHMeFNQQxKOmUgmppOjIM",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 213,
+      "titel": "Der Fluch der Medusa",
+      "albumId": "4BZfSV9maCil4l4yftT74F",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 214,
+      "titel": "und der Geisterbunker",
+      "albumId": "1cJ3fNx6K47p4eDFqhnvsA",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 215,
+      "titel": "und die verlorene Zeit",
+      "albumId": "76pYNMMVZTiuNy3IoXcavU",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 216,
+      "titel": "Die Schwingen des Unheils",
+      "albumId": "2BkEUZY7Da7bqlUjmMA2Cq",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 217,
+      "titel": "und der Kristallschädel",
+      "albumId": "1WlRnNunbHpnRTTVkxMRnd",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 218,
+      "titel": "Im Netz der Lügen",
+      "albumId": "2WwOKZLpFWrvw3O9CISod1",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 219,
+      "titel": "und die Teufelsklippe",
+      "albumId": "6ewdyVIW2LurJhYGU0UBAa",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 220,
+      "titel": "Im Wald der Gefahren",
+      "albumId": "01i4iyB40EU7Qgd6EgKoZt",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 221,
+      "titel": "Manuskript des Satans",
+      "albumId": "1KpVSqapKAUAtAepWWxPWs",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 222,
+      "titel": "und die Gesetzlosen",
+      "albumId": "3o2Gwvg8lqLNRnlV1v1s5K",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 223,
+      "titel": "und der Knochenmann",
+      "albumId": "451jKBwuSNrNgLlqEAZfra",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 224,
+      "titel": "Die Yacht des Verrats",
+      "albumId": "7JhdaReI98XYFrzb3jJPFa",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 225,
+      "titel": "und der Puppenmacher",
+      "albumId": "0FuC7q4bJG41g1naKBx4ot",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 226,
+      "titel": "Die Spur der Toten",
+      "albumId": "3Sv5tE8PcAlGY6Ys2ISQXF",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 227,
+      "titel": "Melodie der Rache",
+      "albumId": "2CMXywsh8wVXXCmr2bLTZ6",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 228,
+      "titel": "Der Ruf der Krähen",
+      "albumId": "6sNAlohza1ZTWVMGhFTGJW",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 229,
+      "titel": "Drehbuch der Täuschung",
+      "albumId": "6SMOmIWODrO1gND2YPpjHf",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 230,
+      "titel": "Der Tag der Toten",
+      "albumId": "154I9rUwPuFHj6snU4amYg",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 231,
+      "titel": "und der Dreiäugige Schakal",
+      "albumId": "6isiJbL3hh7e60KigIgKuY",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 232,
+      "titel": "Die Stadt aus Gold",
+      "albumId": "1Qnn3AAN3Nquv7GlNk41YQ",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 233,
+      "titel": "Die Nacht der Gewitter",
+      "albumId": "0qZ0R61AqoD2i8GnzUk91C",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 234,
+      "titel": "und der lebende Tresor",
+      "albumId": "4sQsFeHojdbFPB07vSg3Rd",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 235,
+      "titel": "und das Fantasmofon",
+      "albumId": "031exGT0P6IWBYY6faqoLV",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 236,
+      "titel": "Im Bann des Barrakudas",
+      "albumId": "5yCEzMfmMnSG97SXDFGjR8",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 237,
+      "titel": "und der rote Büffel",
+      "albumId": "1IkEurD7s47M9ukevi0bWA",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 238,
+      "titel": "Falsche Schuld",
+      "albumId": "00Pxqrupz6xjkI0vd4Otxb",
+      "skipLeadingTracks": 1
+    },
+    {
+      "nummer": 239,
+      "titel": "Das Geheimnis der sieben Palmen",
+      "albumId": "2mh0BDhRAJFa7clABwut3L",
+      "skipLeadingTracks": 1
+    }
   ]
 }
