@@ -17,6 +17,10 @@ function escapeAttr(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
 }
 
+function escapeHtml(value: string): string {
+  return escapeAttr(value).replace(/>/g, '&gt;')
+}
+
 export function mountApp(el: HTMLElement): void {
   root = el
   handleRedirect().then(route)
@@ -171,7 +175,7 @@ function checkAnswer(): void {
 function renderResult(message: string): void {
   render(root, `
     <h1>Ergebnis</h1>
-    <div class="result">${message}</div>
+    <div class="result">${escapeHtml(message)}</div>
     <button type="button" id="next">Nächstes Quiz</button>
     <button type="button" class="secondary" id="home">Startseite</button>
   `)

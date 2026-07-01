@@ -44,6 +44,7 @@ input[inputmode="numeric"] {
   margin-bottom: 12px;
 }
 .status { min-height: 1.5em; color: var(--muted); margin: 12px 0; }
+.hint { color: var(--muted); font-size: 0.9rem; margin: 8px 0 0; }
 .error { color: #ff5c61; }
 .result { white-space: pre-line; font-size: 1.25rem; margin: 16px 0; }
 button:focus-visible, input:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
