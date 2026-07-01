@@ -7,7 +7,7 @@ export interface StartRoundDeps {
   mode: Mode
   token: string
   getAlbumTracks: (albumId: string, token: string) => Promise<Track[]>
-  excludeAlbumId?: string
+  excludeAlbumIds?: string[]
   rng?: () => number
 }
 
@@ -19,13 +19,30 @@ export interface Round {
 
 const trackCache = new Map<string, Track[]>()
 
+async function loadTracks(deps: StartRoundDeps, albumId: string): Promise<Track[]> {
+  const cached = trackCache.get(albumId)
+  if (cached) return cached
+  const tracks = await deps.getAlbumTracks(albumId, deps.token)
+  trackCache.set(albumId, tracks)
+  return tracks
+}
+
 export async function startRound(deps: StartRoundDeps): Promise<Round> {
-  const folge = pickRandomFolge(deps.folgen, deps.rng, deps.excludeAlbumId)
-  let tracks = trackCache.get(folge.albumId)
-  if (!tracks) {
-    tracks = await deps.getAlbumTracks(folge.albumId, deps.token)
-    trackCache.set(folge.albumId, tracks)
+  const failed = new Set(deps.excludeAlbumIds ?? [])
+  let lastError: unknown = null
+
+  for (let attempt = 0; attempt < deps.folgen.length; attempt++) {
+    const folge = pickRandomFolge(deps.folgen, deps.rng, [...failed])
+    try {
+      const tracks = await loadTracks(deps, folge.albumId)
+      const positionMs = initialPosition({ mode: deps.mode, tracks, rng: deps.rng })
+      return { folge, tracks, positionMs }
+    } catch (error) {
+      lastError = error
+      failed.add(folge.albumId)
+    }
   }
-  const positionMs = initialPosition({ mode: deps.mode, tracks, rng: deps.rng })
-  return { folge, tracks, positionMs }
+
+  const detail = lastError instanceof Error ? lastError.message : String(lastError)
+  throw new Error(`Keine Folge konnte geladen werden: ${detail}`)
 }

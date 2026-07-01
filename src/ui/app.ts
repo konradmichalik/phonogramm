@@ -2,9 +2,10 @@ import folgenJson from '../data/folgen.json'
 import { parseFolgenData } from '../data/folgenSchema'
 import { beginLogin, exchangeCodeForToken, getAccessToken, getSpotifyConfig } from '../auth/spotifyAuth'
 import { getAlbumTracks, NoActiveDeviceError } from '../spotify/client'
-import { playClip as realPlayClip } from '../spotify/playback'
+import { playClip } from '../spotify/playback'
 import { startRound, type Round } from '../quiz/round'
 import { evaluateAnswer } from '../quiz/quizLogic'
+import { positionToClip, scrub } from '../quiz/timeline'
 import { validateGuess } from '../quiz/validateGuess'
 import { getClientId, getMode, setClientId, setMode } from '../state/settings'
 import { render, setStatus } from './render'
@@ -12,6 +13,7 @@ import { render, setStatus } from './render'
 const data = parseFolgenData(folgenJson)
 let root: HTMLElement
 let current: Round | null = null
+let lastAlbumId: string | null = null
 
 function escapeAttr(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
@@ -108,36 +110,54 @@ function renderSettings(): void {
   root.querySelector('#back')!.addEventListener('click', () => (location.hash = '#/'))
 }
 
+async function loadRound(token: string): Promise<boolean> {
+  try {
+    current = await startRound({
+      folgen: data.folgen,
+      mode: getMode(),
+      token,
+      getAlbumTracks,
+      excludeAlbumIds: lastAlbumId ? [lastAlbumId] : [],
+    })
+    lastAlbumId = current.folge.albumId
+    return true
+  } catch (e) {
+    setStatus('Konnte Folge nicht laden: ' + (e instanceof Error ? e.message : ''), true)
+    return false
+  }
+}
+
 async function renderQuiz(): Promise<void> {
   const token = getAccessToken()
   if (!token) return void (location.hash = '#/')
   render(root, `
     <h1>Welche Folge?</h1>
-    <button type="button" id="play">▶ Ausschnitt abspielen</button>
+    <div class="controls">
+      <button type="button" id="back10">−10 Sek</button>
+      <button type="button" id="back5">−5 Sek</button>
+      <button type="button" id="play">▶ Abspielen</button>
+      <button type="button" id="fwd5">+5 Sek</button>
+      <button type="button" id="fwd10">+10 Sek</button>
+    </div>
+    <button type="button" class="secondary" id="skip">⏭ Andere Folge</button>
     <label for="guess">Folgennummer</label>
     <input type="text" inputmode="numeric" maxlength="3" id="guess" placeholder="z. B. 42" autocomplete="off" />
     <button type="button" id="check">Antwort prüfen</button>
     <div id="status" class="status" role="status" aria-live="polite"></div>
   `)
   setStatus('Audio lädt …')
-  try {
-    current = await startRound({
-      folgen: data.folgen,
-      defaultIntroEndMs: data.defaultIntroEndMs,
-      mode: getMode(),
-      token,
-      getAlbumTracks,
-      playClip: realPlayClip,
-    })
-    setStatus('Bereit. Tippe auf Abspielen.')
-  } catch {
-    setStatus('Konnte Folge nicht laden.', true)
-    return
-  }
+  const ok = await loadRound(token)
+  if (!ok) return
 
-  root.querySelector('#play')!.addEventListener('click', playCurrent)
+  root.querySelector('#play')!.addEventListener('click', () => void playCurrentClip())
+  root.querySelector('#back10')!.addEventListener('click', () => void scrubAndPlay(-10000))
+  root.querySelector('#back5')!.addEventListener('click', () => void scrubAndPlay(-5000))
+  root.querySelector('#fwd5')!.addEventListener('click', () => void scrubAndPlay(5000))
+  root.querySelector('#fwd10')!.addEventListener('click', () => void scrubAndPlay(10000))
+  root.querySelector('#skip')!.addEventListener('click', () => void skipToOtherFolge())
   root.querySelector('#check')!.addEventListener('click', checkAnswer)
   root.querySelector<HTMLInputElement>('#guess')!.addEventListener('input', clearErrorOnInput)
+  setStatus('Bereit. Tippe auf Abspielen.')
 }
 
 function clearErrorOnInput(): void {
@@ -150,17 +170,29 @@ function clearErrorOnInput(): void {
   if (!result.valid) setStatus(result.error, true)
 }
 
-async function playCurrent(): Promise<void> {
+async function playCurrentClip(): Promise<void> {
   if (!current) return
+  const token = getAccessToken()
+  if (!token) return
   setStatus('Wiedergabe läuft …')
   try {
-    await current.play()
+    await playClip(token, positionToClip(current.tracks, current.positionMs))
     setStatus('Fertig. Deine Antwort?')
   } catch (e) {
     setStatus(e instanceof NoActiveDeviceError
       ? 'Bitte öffne die Spotify-App auf deinem Handy.'
       : 'Wiedergabe fehlgeschlagen.', true)
   }
+}
+
+async function scrubAndPlay(stepMs: number): Promise<void> {
+  if (!current) return
+  current = { ...current, positionMs: scrub(current.positionMs, stepMs, current.tracks) }
+  await playCurrentClip()
+}
+
+async function skipToOtherFolge(): Promise<void> {
+  await renderQuiz()
 }
 
 function checkAnswer(): void {
@@ -179,6 +211,6 @@ function renderResult(message: string): void {
     <button type="button" id="next">Nächstes Quiz</button>
     <button type="button" class="secondary" id="home">Startseite</button>
   `)
-  root.querySelector('#next')!.addEventListener('click', () => renderQuiz())
+  root.querySelector('#next')!.addEventListener('click', () => void renderQuiz())
   root.querySelector('#home')!.addEventListener('click', () => (location.hash = '#/'))
 }

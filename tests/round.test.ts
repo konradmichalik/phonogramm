@@ -43,3 +43,44 @@ test('startRound caches tracks by albumId', async () => {
   expect(callCount).toBe(1) // Still 1 — cache hit
   expect(round2.tracks).toEqual(cachedTracks)
 })
+
+test('startRound versucht die nächste Folge, wenn eine fehlschlägt', async () => {
+  const resilientFolgen: Folge[] = [
+    { nummer: 1, titel: 'Fails', albumId: 'resilience-a' },
+    { nummer: 2, titel: 'Works', albumId: 'resilience-b' },
+  ]
+  const workingTracks: Track[] = [{ uri: 'ok-t0', durationMs: 60000 }]
+
+  const round = await startRound({
+    folgen: resilientFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async (albumId) => {
+      if (albumId === 'resilience-a') throw new Error('Album-Tracks laden fehlgeschlagen (404)')
+      return workingTracks
+    },
+    rng: () => 0, // would pick 'resilience-a' first without resilience
+  })
+
+  expect(round.folge.albumId).toBe('resilience-b')
+  expect(round.tracks).toEqual(workingTracks)
+})
+
+test('startRound wirft, wenn alle Folgen fehlschlagen, mit dem letzten Fehlertext', async () => {
+  const allFailFolgen: Folge[] = [
+    { nummer: 1, titel: 'A', albumId: 'all-fail-a' },
+    { nummer: 2, titel: 'B', albumId: 'all-fail-b' },
+  ]
+
+  await expect(
+    startRound({
+      folgen: allFailFolgen,
+      mode: 'start',
+      token: 'TOK',
+      getAlbumTracks: async (albumId) => {
+        throw new Error(`Album-Tracks laden fehlgeschlagen (404) für ${albumId}`)
+      },
+      rng: () => 0,
+    }),
+  ).rejects.toThrow(/\(404\)/)
+})

@@ -27,6 +27,22 @@ button {
   margin-bottom: 12px;
 }
 button.secondary { background: var(--surface); color: var(--text); }
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.controls button {
+  flex: 1 1 calc(33.333% - 8px);
+  min-width: 88px;
+  width: auto;
+  margin-bottom: 0;
+}
+.controls button#play {
+  flex-basis: 100%;
+  order: -1;
+}
 label {
   display: block;
   margin-bottom: 12px;
