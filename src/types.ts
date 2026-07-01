@@ -4,11 +4,9 @@ export interface Folge {
   nummer: number
   titel: string
   albumId: string
-  introEndMs?: number
 }
 
 export interface FolgenData {
-  defaultIntroEndMs: number
   folgen: Folge[]
 }
 

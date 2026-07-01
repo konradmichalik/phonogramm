@@ -1,8 +1,11 @@
 import type { Folge } from '../types'
 
-export function pickRandomFolge(folgen: Folge[], rng: () => number = Math.random): Folge {
-  const index = Math.floor(rng() * folgen.length)
-  return folgen[Math.min(index, folgen.length - 1)]
+export function pickRandomFolge(folgen: Folge[], rng: () => number = Math.random, excludeAlbumId?: string): Folge {
+  const candidates =
+    excludeAlbumId && folgen.length > 1 ? folgen.filter((folge) => folge.albumId !== excludeAlbumId) : folgen
+  const pool = candidates.length > 0 ? candidates : folgen
+  const index = Math.floor(rng() * pool.length)
+  return pool[Math.min(index, pool.length - 1)]
 }
 
 export function evaluateAnswer(guess: number, folge: Folge): { correct: boolean; message: string } {

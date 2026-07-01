@@ -15,6 +15,18 @@ test('pickRandomFolge klemmt Index bei rng() === 1', () => {
   expect(pickRandomFolge(folgen, () => 1).nummer).toBe(2)
 })
 
+test('pickRandomFolge schließt excludeAlbumId aus', () => {
+  const result = pickRandomFolge(folgen, () => 0, 'a')
+  expect(result.albumId).not.toBe('a')
+  expect(result.nummer).toBe(2)
+})
+
+test('pickRandomFolge fällt auf volle Liste zurück, wenn nur eine Folge übrig bleibt', () => {
+  const singleFolge: Folge[] = [{ nummer: 1, titel: 'A', albumId: 'a' }]
+  const result = pickRandomFolge(singleFolge, () => 0, 'a')
+  expect(result.nummer).toBe(1)
+})
+
 test('evaluateAnswer korrekt', () => {
   const r = evaluateAnswer(125, { nummer: 125, titel: 'Feuermond', albumId: 'x' })
   expect(r.correct).toBe(true)

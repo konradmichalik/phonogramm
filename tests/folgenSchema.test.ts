@@ -4,7 +4,6 @@ import { parseFolgenData } from '../src/data/folgenSchema'
 describe('folgenSchema', () => {
   it('akzeptiert gültige Folgendaten', () => {
     const data = parseFolgenData({
-      defaultIntroEndMs: 35000,
       folgen: [{ nummer: 125, titel: 'Feuermond', albumId: 'abc' }],
     })
     expect(data.folgen[0].nummer).toBe(125)
@@ -13,7 +12,6 @@ describe('folgenSchema', () => {
   it('lehnt Folge ohne albumId ab', () => {
     expect(() =>
       parseFolgenData({
-        defaultIntroEndMs: 35000,
         folgen: [{ nummer: 1, titel: 'X' }],
       }),
     ).toThrow()
@@ -22,7 +20,6 @@ describe('folgenSchema', () => {
   it('lehnt nummer < 1 ab', () => {
     expect(() =>
       parseFolgenData({
-        defaultIntroEndMs: 35000,
         folgen: [{ nummer: 0, titel: 'X', albumId: 'a' }],
       }),
     ).toThrow()
