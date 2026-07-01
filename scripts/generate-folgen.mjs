@@ -158,18 +158,76 @@ async function resolveArtistId(token) {
   return artist
 }
 
-async function fetchAllAlbumRefs(artistId, token) {
-  const refs = new Map()
-  let url =
-    `https://api.spotify.com/v1/artists/${artistId}/albums` +
-    `?include_groups=album&limit=20&market=DE`
+const LIMIT_STEPS = [50, 20, 10]
 
-  while (url) {
-    const data = await spotifyFetch(url, token)
+// Some app tiers reject the artist-albums endpoint with a misleading
+// "Invalid limit" 400 regardless of the value. Try decreasing limits, and if
+// every value is rejected, fall back to the album search endpoint.
+async function fetchAllAlbumRefs(artistId, token) {
+  const base =
+    `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album&market=DE`
+  const refs = new Map()
+  let firstPage = null
+
+  for (const limit of LIMIT_STEPS) {
+    try {
+      firstPage = await spotifyFetch(`${base}&limit=${limit}`, token)
+      break
+    } catch (error) {
+      if (/invalid limit/i.test(error.message)) continue
+      throw error
+    }
+  }
+
+  if (!firstPage) {
+    console.log('Künstler-Alben-Endpunkt blockiert — weiche auf Album-Suche aus…')
+    return searchAlbumRefs(token)
+  }
+
+  let data = firstPage
+  for (;;) {
     for (const album of data.items ?? []) {
       if (album?.id) refs.set(album.id, { id: album.id, name: album.name })
     }
-    url = data.next
+    if (!data.next) break
+    data = await spotifyFetch(data.next, token)
+  }
+
+  return [...refs.values()]
+}
+
+// Fallback: page through the album search endpoint (works on tiers where the
+// artist-albums listing is blocked).
+async function searchAlbumRefs(token) {
+  const refs = new Map()
+  const q = encodeURIComponent(ARTIST_NAME)
+  let offset = 0
+
+  while (offset <= 900) {
+    let page = null
+    let used = 0
+    for (const limit of LIMIT_STEPS) {
+      try {
+        page = await spotifyFetch(
+          `https://api.spotify.com/v1/search?type=album&market=DE&q=${q}&limit=${limit}&offset=${offset}`,
+          token,
+        )
+        used = limit
+        break
+      } catch (error) {
+        if (/invalid limit/i.test(error.message)) continue
+        throw error
+      }
+    }
+    if (!page) throw new Error('Album-Suche: alle limit-Werte abgelehnt.')
+
+    const items = page.albums?.items ?? []
+    for (const album of items) {
+      if (album?.id) refs.set(album.id, { id: album.id, name: album.name })
+    }
+    console.log(`Album-Suche: ${refs.size} Alben gefunden (offset ${offset})`)
+    if (items.length < used || !page.albums?.next) break
+    offset += used
   }
 
   return [...refs.values()]
