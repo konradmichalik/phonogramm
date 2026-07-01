@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@fontsource/anton": "^5.2.7",
-    "@fontsource/archivo": "^5.2.8",
+    "@fontsource/hanken-grotesk": "^5.2.5",
     "zod": "^3.23.0"
   }
 }
