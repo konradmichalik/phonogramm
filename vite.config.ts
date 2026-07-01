@@ -10,5 +10,6 @@ export default defineConfig({
         storageQuota: 10000000,
       },
     },
+    exclude: ['e2e/**', 'node_modules/**'],
   },
 })
