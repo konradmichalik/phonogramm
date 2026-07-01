@@ -14,7 +14,7 @@ test('startRound liefert Folge + Tracks + positionMs', async () => {
   })
   expect(round.folge.nummer).toBe(5)
   expect(round.tracks).toEqual(tracks)
-  expect(round.positionMs).toBe(0)
+  expect(round.positionMs).toBe(42000) // Folge <= 124 -> Intro-Ende bei 42s
 })
 
 test('startRound caches tracks by albumId', async () => {
@@ -122,7 +122,7 @@ test('startRound entfernt skipLeadingTracks führende Tracks (Spoiler-Inhaltsang
   })
 
   expect(round.tracks).toEqual([t1, t2])
-  expect(round.positionMs).toBe(0) // mode 'start' -> initialPosition computed over sliced set
+  expect(round.positionMs).toBe(49000) // Folge 239 >= 125 -> Intro-Ende bei 49s, over sliced set berechnet
 })
 
 test('startRound lässt Tracks unverändert, wenn skipLeadingTracks fehlt', async () => {
@@ -138,6 +138,36 @@ test('startRound lässt Tracks unverändert, wenn skipLeadingTracks fehlt', asyn
   })
 
   expect(round.tracks).toEqual(tracks)
+})
+
+test('startRound (Modus start): Folge <= 124 startet bei 42000ms (Intro-Ende)', async () => {
+  const earlyFolgen: Folge[] = [{ nummer: 42, titel: 'Früh', albumId: 'intro-early-alb' }]
+  const longTrack: Track[] = [{ uri: 'long-t0', durationMs: 300000 }]
+
+  const round = await startRound({
+    folgen: earlyFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async () => longTrack,
+    rng: () => 0,
+  })
+
+  expect(round.positionMs).toBe(42000)
+})
+
+test('startRound (Modus start): Folge >= 125 startet bei 49000ms (Intro-Ende)', async () => {
+  const lateFolgen: Folge[] = [{ nummer: 239, titel: 'Spät', albumId: 'intro-late-alb' }]
+  const longTrack: Track[] = [{ uri: 'long-t0', durationMs: 300000 }]
+
+  const round = await startRound({
+    folgen: lateFolgen,
+    mode: 'start',
+    token: 'TOK',
+    getAlbumTracks: async () => longTrack,
+    rng: () => 0,
+  })
+
+  expect(round.positionMs).toBe(49000)
 })
 
 test('startRound behandelt skipLeadingTracks >= Trackanzahl als Ladefehler und versucht die nächste Folge', async () => {

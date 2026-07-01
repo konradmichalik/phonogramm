@@ -1,4 +1,4 @@
-import { totalDurationMs, initialPosition, scrub, positionToClip } from '../src/quiz/timeline'
+import { totalDurationMs, initialPosition, scrub, positionToClip, introEndMs } from '../src/quiz/timeline'
 import type { Track } from '../src/types'
 
 const A: Track[] = [
@@ -12,8 +12,34 @@ test('totalDurationMs summiert alle Track-Dauern', () => {
   expect(totalDurationMs(A)).toBe(330000)
 })
 
-test('initialPosition start: immer 0', () => {
+test('introEndMs: 42s für Folge 1', () => {
+  expect(introEndMs(1)).toBe(42000)
+})
+
+test('introEndMs: 42s für Folge 124 (Grenze)', () => {
+  expect(introEndMs(124)).toBe(42000)
+})
+
+test('introEndMs: 49s für Folge 125 (Grenze)', () => {
+  expect(introEndMs(125)).toBe(49000)
+})
+
+test('introEndMs: 49s für Folge 239', () => {
+  expect(introEndMs(239)).toBe(49000)
+})
+
+test('initialPosition start: ohne startOffsetMs weiterhin 0 (backward-compat)', () => {
   expect(initialPosition({ mode: 'start', tracks: A })).toBe(0)
+})
+
+test('initialPosition start: nutzt startOffsetMs, wenn Timeline lang genug ist', () => {
+  expect(initialPosition({ mode: 'start', tracks: A, startOffsetMs: 42000 })).toBe(42000)
+})
+
+test('initialPosition start: klemmt startOffsetMs auf total - CLIP_MS, wenn zu groß', () => {
+  const shortTracks: Track[] = [{ uri: 's0', durationMs: 10000 }]
+  // total=10000, CLIP_MS=5000 -> max allowed offset = 5000
+  expect(initialPosition({ mode: 'start', tracks: shortTracks, startOffsetMs: 42000 })).toBe(5000)
 })
 
 test('initialPosition random: untere Grenze bei rng=0', () => {

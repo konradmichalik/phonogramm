@@ -1,20 +1,29 @@
 import { CLIP_MS, type ClipPosition, type Mode, type Track } from '../types'
 
+export const INTRO_MS_EARLY = 42000 // Folgen 1–124
+export const INTRO_MS_LATE = 49000 // Folgen ab 125
+
 interface InitialPositionArgs {
   mode: Mode
   tracks: Track[]
   rng?: () => number
+  startOffsetMs?: number
 }
 
 const clamp = (value: number, lower: number, upper: number): number => Math.max(lower, Math.min(value, upper))
+
+export function introEndMs(nummer: number): number {
+  return nummer <= 124 ? INTRO_MS_EARLY : INTRO_MS_LATE
+}
 
 export function totalDurationMs(tracks: Track[]): number {
   return tracks.reduce((sum, track) => sum + track.durationMs, 0)
 }
 
-export function initialPosition({ mode, tracks, rng = Math.random }: InitialPositionArgs): number {
+export function initialPosition({ mode, tracks, rng = Math.random, startOffsetMs = 0 }: InitialPositionArgs): number {
   if (mode === 'start') {
-    return 0
+    const total = totalDurationMs(tracks)
+    return clamp(startOffsetMs, 0, Math.max(0, total - CLIP_MS))
   }
 
   const total = totalDurationMs(tracks)

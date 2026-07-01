@@ -1,6 +1,6 @@
 import type { Folge, Mode, Track } from '../types'
 import { pickRandomFolge } from './quizLogic'
-import { initialPosition } from './timeline'
+import { initialPosition, introEndMs } from './timeline'
 
 export interface StartRoundDeps {
   folgen: Folge[]
@@ -42,7 +42,12 @@ export async function startRound(deps: StartRoundDeps): Promise<Round> {
       const tracks = await loadTracks(deps, folge.albumId)
       const playable = playableTracks(folge, tracks)
       if (playable.length === 0) throw new Error(`Keine Tracks für Album ${folge.albumId}`)
-      const positionMs = initialPosition({ mode: deps.mode, tracks: playable, rng: deps.rng })
+      const positionMs = initialPosition({
+        mode: deps.mode,
+        tracks: playable,
+        rng: deps.rng,
+        startOffsetMs: introEndMs(folge.nummer),
+      })
       return { folge, tracks: playable, positionMs }
     } catch (error) {
       lastError = error
