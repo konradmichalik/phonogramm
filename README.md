@@ -82,11 +82,13 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 
 ### Folgen automatisch generieren
 
-Statt die Einträge manuell zu pflegen, kann `src/data/folgen.json` aus einer Spotify-Playlist
-generiert werden, die alle Folgen als Alben enthält (Standard: „Die Drei Fragezeichen (Alle
-Folgen: 001-239)", Playlist-ID `05WXW6fLpDY1P2gg1YqhbJ`). Das Skript liest die komplette
-Playlist, gruppiert die Tracks nach Album, leitet Folgennummer/Titel aus dem Albumnamen ab und
-erkennt eine führende „Inhaltsangabe"-Spur automatisch als `skipLeadingTracks`.
+Statt die Einträge manuell zu pflegen, kann `src/data/folgen.json` aus dem kompletten
+Alben-Katalog des Spotify-Künstlers „Die drei ???" generiert werden. Das Skript sucht den
+Künstler automatisch, listet alle seine Alben, leitet Folgennummer/Titel aus jedem Albumnamen ab
+und erkennt eine führende „Inhaltsangabe"-Spur automatisch als `skipLeadingTracks`. Der
+Künstler-Katalog wird bewusst statt einer Playlist verwendet, da Lesezugriffe auf fremde
+öffentliche Playlists mit dem App-Token HTTP 403 liefern können — Künstler/Alben-Endpunkte
+funktionieren mit demselben Token zuverlässig.
 
 Zum Ausführen wird ein gültiger Spotify-Zugriffstoken benötigt:
 
@@ -96,15 +98,15 @@ Zum Ausführen wird ein gültiger Spotify-Zugriffstoken benötigt:
 3. Den Wert kopieren und das Skript damit starten:
 
 ```bash
-SPOTIFY_TOKEN=<token> node scripts/generate-folgen.mjs [playlistId]
-# oder mit npm-Script (nutzt die Standard-Playlist):
 SPOTIFY_TOKEN=<token> npm run generate:folgen
+# optional: Künstlersuche überspringen und Künstler-ID direkt vorgeben
+SPOTIFY_TOKEN=<token> SPOTIFY_ARTIST_ID=<artistId> npm run generate:folgen
 ```
 
 Das Skript **überschreibt** `src/data/folgen.json` vollständig. Am Ende gibt es einen Bericht
-aus: Anzahl gefundener Alben, geschriebener Folgen, Folgen mit erkannter Inhaltsangabe,
-Nummern-Kollisionen sowie eine Liste nicht zuordenbarer Album-Namen — diese müssen anschließend
-manuell in die JSON-Datei ergänzt werden.
+aus: verwendeter Künstler, Anzahl gefundener Alben, geschriebener Folgen, Folgen mit erkannter
+Inhaltsangabe, Nummern-Kollisionen sowie eine Liste nicht zuordenbarer Album-Namen — diese müssen
+anschließend manuell in die JSON-Datei ergänzt werden.
 
 ## Deployment (GitHub Pages)
 

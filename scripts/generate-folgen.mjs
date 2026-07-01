@@ -1,16 +1,18 @@
 #!/usr/bin/env node
-// Generates src/data/folgen.json from a Spotify playlist containing all
-// "Die Drei ???" episode chapters. Groups playlist tracks by album (= episode),
-// parses the episode number/title from the album name, and auto-detects a
-// leading synopsis track to skip.
+// Generates src/data/folgen.json from the Spotify ARTIST album catalog of
+// "Die drei ???". Lists every album by the artist, parses the episode
+// number/title from each album name, and auto-detects a leading synopsis
+// track to skip. Uses artist/album endpoints only (no playlist reads, which
+// can return 403 for third-party playlists).
 //
-// Usage: SPOTIFY_TOKEN=<token> node scripts/generate-folgen.mjs [playlistId]
+// Usage: SPOTIFY_TOKEN=<token> node scripts/generate-folgen.mjs
+//        Optional: SPOTIFY_ARTIST_ID=<id> to override artist resolution.
 
 import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
-const DEFAULT_PLAYLIST_ID = '05WXW6fLpDY1P2gg1YqhbJ'
+const ARTIST_NAME = 'Die drei ???'
 const SYNOPSIS_PATTERN = /inhaltsangabe|zusammenfassung/i
 const SERIES_PREFIX_PATTERN = /^die\s+drei\s+(\?{3}|fragezeichen)\s*/i
 const LEADING_LABEL_PATTERN = /^(folge|fall)\s*/i
@@ -65,18 +67,34 @@ export function detectSkipLeadingTracks(tracks) {
   return count
 }
 
-async function fetchPlaylistTracks(playlistId, token) {
-  const tracks = []
-  let offset = 0
-  const limit = 100
-  let total = Infinity
+/**
+ * Picks the best-matching artist from a Spotify search result's
+ * `artists.items` array. Prefers an exact (case-insensitive) name match to
+ * "Die drei ???"; among exact matches, picks the one with the highest
+ * follower count. Returns null when the list is empty.
+ * @param {Array<{ id: string, name: string, followers?: { total?: number } }>} items
+ * @returns {{ id: string, name: string, followers: number } | null}
+ */
+export function pickArtist(items) {
+  if (!Array.isArray(items) || items.length === 0) return null
 
-  while (offset < total) {
-    const url =
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks` +
-      `?limit=${limit}&offset=${offset}` +
-      `&fields=items(track(name,track_number,disc_number,album(id,name))),next,total`
+  const normalized = items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    followers: item.followers?.total ?? 0,
+  }))
 
+  const exactMatches = normalized.filter(
+    (item) => item.name.trim().toLowerCase() === ARTIST_NAME.toLowerCase(),
+  )
+
+  const candidates = exactMatches.length > 0 ? exactMatches : normalized
+  candidates.sort((a, b) => b.followers - a.followers)
+  return candidates[0]
+}
+
+async function spotifyFetch(url, token) {
+  for (;;) {
     const response = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -102,31 +120,69 @@ async function fetchPlaylistTracks(playlistId, token) {
       )
     }
 
-    const data = await response.json()
-    for (const item of data.items ?? []) {
-      if (item.track) tracks.push(item.track)
-    }
-
-    total = data.total ?? tracks.length
-    offset += limit
-    console.log(`${Math.min(offset, total)}/${total}`)
-
-    if (!data.next) break
+    return response.json()
   }
-
-  return tracks
 }
 
-function groupTracksByAlbum(tracks) {
-  const albums = new Map()
-  for (const track of tracks) {
-    const album = track.album
-    if (!album?.id) continue
-    if (!albums.has(album.id)) {
-      albums.set(album.id, { albumId: album.id, name: album.name, tracks: [] })
-    }
-    albums.get(album.id).tracks.push(track)
+async function resolveArtistId(token) {
+  if (process.env.SPOTIFY_ARTIST_ID) {
+    return { id: process.env.SPOTIFY_ARTIST_ID, name: '(aus SPOTIFY_ARTIST_ID)', followers: null }
   }
+
+  const url = `https://api.spotify.com/v1/search?type=artist&limit=10&q=${encodeURIComponent(ARTIST_NAME)}`
+  const data = await spotifyFetch(url, token)
+  const artist = pickArtist(data.artists?.items ?? [])
+
+  if (!artist) {
+    throw new Error(
+      `Kein Spotify-Künstler für "${ARTIST_NAME}" gefunden. ` +
+        'Bitte SPOTIFY_ARTIST_ID als Umgebungsvariable setzen, um die Künstlersuche zu überspringen.',
+    )
+  }
+
+  return artist
+}
+
+async function fetchAllAlbumRefs(artistId, token) {
+  const refs = new Map()
+  let url =
+    `https://api.spotify.com/v1/artists/${artistId}/albums` +
+    `?include_groups=album&limit=50&market=DE`
+
+  while (url) {
+    const data = await spotifyFetch(url, token)
+    for (const album of data.items ?? []) {
+      if (album?.id) refs.set(album.id, { id: album.id, name: album.name })
+    }
+    url = data.next
+  }
+
+  return [...refs.values()]
+}
+
+async function fetchAlbumsWithTracks(albumRefs, token) {
+  const albums = new Map()
+  const batchSize = 20
+
+  for (let i = 0; i < albumRefs.length; i += batchSize) {
+    const batch = albumRefs.slice(i, i + batchSize)
+    const ids = batch.map((ref) => ref.id).join(',')
+    const url = `https://api.spotify.com/v1/albums?ids=${ids}&market=DE`
+    const data = await spotifyFetch(url, token)
+
+    for (const album of data.albums ?? []) {
+      if (!album?.id) continue
+      albums.set(album.id, {
+        albumId: album.id,
+        name: album.name,
+        tracks: album.tracks?.items ?? [],
+        totalTracks: album.total_tracks ?? album.tracks?.items?.length ?? 0,
+      })
+    }
+
+    console.log(`Alben-Details geladen: ${Math.min(i + batchSize, albumRefs.length)}/${albumRefs.length}`)
+  }
+
   return albums
 }
 
@@ -148,7 +204,7 @@ function buildFolgen(albums) {
       titel: parsed.titel,
       albumId: album.albumId,
       ...(skipLeadingTracks > 0 ? { skipLeadingTracks } : {}),
-      _trackCount: album.tracks.length,
+      _trackCount: album.totalTracks ?? album.tracks.length,
     }
 
     const existing = byNummer.get(parsed.nummer)
@@ -211,13 +267,20 @@ async function main() {
     process.exit(1)
   }
 
-  const playlistId = process.argv[2] || DEFAULT_PLAYLIST_ID
+  const artist = await resolveArtistId(token)
+  console.log(
+    `Künstler: ${artist.name} (id=${artist.id}${
+      artist.followers !== null ? `, followers=${artist.followers}` : ''
+    })`,
+  )
 
-  console.log(`Lade Playlist ${playlistId}…`)
-  const tracks = await fetchPlaylistTracks(playlistId, token)
-  console.log(`${tracks.length} Tracks geladen.`)
+  console.log('Lade Alben-Liste des Künstlers…')
+  const albumRefs = await fetchAllAlbumRefs(artist.id, token)
+  console.log(`${albumRefs.length} Alben gefunden.`)
 
-  const albums = groupTracksByAlbum(tracks)
+  console.log('Lade Alben-Details (inkl. erster Tracks) in Batches…')
+  const albums = await fetchAlbumsWithTracks(albumRefs, token)
+
   const { byNummer, unparsed, collisions } = buildFolgen(albums)
   const { valid, invalid } = validateEntries(byNummer)
 
@@ -227,6 +290,7 @@ async function main() {
   const withSkip = valid.filter((f) => (f.skipLeadingTracks ?? 0) > 0).length
 
   console.log('\n--- Zusammenfassung ---')
+  console.log(`Künstler: ${artist.name} (id=${artist.id})`)
   console.log(`Alben insgesamt gesehen: ${albums.size}`)
   console.log(`Folgen geschrieben: ${valid.length}`)
   console.log(`Davon mit skipLeadingTracks > 0: ${withSkip}`)
