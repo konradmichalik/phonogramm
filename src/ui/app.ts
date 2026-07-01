@@ -149,7 +149,7 @@ function renderSettings(): void {
       <label class="mode-card" for="mode-start">
         <input type="radio" id="mode-start" name="mode" value="start" ${mode === 'start' ? 'checked' : ''}/>
         <span class="mode-card__title">Folgenbeginn</span>
-        <span class="mode-card__desc">Rate die Folge anhand des Anfangs (nach dem Intro).</span>
+        <span class="mode-card__desc">Rate die Folge ab dem Anfang (inkl. Intro) – mit +5s weiterhören.</span>
       </label>
       <label class="mode-card" for="mode-random">
         <input type="radio" id="mode-random" name="mode" value="random" ${mode === 'random' ? 'checked' : ''}/>
