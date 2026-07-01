@@ -1,0 +1,7 @@
+{
+  "defaultIntroEndMs": 35000,
+  "folgen": [
+    { "nummer": 125, "titel": "Feuermond", "albumId": "PLATZHALTER_ALBUM_ID" },
+    { "nummer": 124, "titel": "Gefährliches Quiz", "albumId": "PLATZHALTER_ALBUM_ID" }
+  ]
+}
