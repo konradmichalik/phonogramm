@@ -23,6 +23,8 @@
     "vitest": "^2.1.0"
   },
   "dependencies": {
+    "@fontsource/anton": "^5.2.7",
+    "@fontsource/archivo": "^5.2.8",
     "zod": "^3.23.0"
   }
 }

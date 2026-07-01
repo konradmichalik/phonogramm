@@ -48,12 +48,27 @@ function route(): void {
   return renderStart()
 }
 
+const HEADER = `
+    <header class="hq-header">
+      <p class="hq-mark" aria-label="Hörspiel-Quiz"><span aria-hidden="true">?</span><span aria-hidden="true">?</span><span aria-hidden="true">?</span></p>
+      <p class="hq-title">Hörspiel-Quiz</p>
+      <div class="hq-accents" aria-hidden="true">
+        <i class="acc-bar"></i>
+        <i class="acc-bar-2"></i>
+        <i class="acc-circle"></i>
+        <i class="acc-ring"></i>
+        <i class="acc-tri"></i>
+      </div>
+    </header>`
+
 function renderStart(): void {
   render(root, `
-    <h1>??? Hörspiel-Quiz</h1>
-    <p>Errate die Folge am 5-Sekunden-Ausschnitt.</p>
-    <button type="button" id="start">Neues Quiz</button>
-    <button type="button" class="secondary" id="settings">Einstellungen</button>
+    ${HEADER}
+    <p class="hq-sub">Errate die Folge am 5-Sekunden-Ausschnitt.</p>
+    <div class="stack">
+      <button type="button" id="start">Neues Quiz</button>
+      <button type="button" class="secondary" id="settings">Einstellungen</button>
+    </div>
     <div id="status" class="status" role="status" aria-live="polite"></div>
   `)
   root.querySelector('#settings')!.addEventListener('click', () => (location.hash = '#/settings'))
@@ -82,7 +97,7 @@ async function startLogin(): Promise<void> {
 function renderSettings(): void {
   const mode = getMode()
   render(root, `
-    <h1>Einstellungen</h1>
+    <h1 class="hq-screen-title">Ein<span class="accent">stellungen</span></h1>
     <fieldset>
       <legend>Ausschnitt-Modus</legend>
       <label for="mode-start">
@@ -131,17 +146,28 @@ async function renderQuiz(): Promise<void> {
   const token = getAccessToken()
   if (!token) return void (location.hash = '#/')
   render(root, `
-    <h1>Welche Folge?</h1>
-    <div class="controls">
-      <button type="button" id="back10">−10 Sek</button>
-      <button type="button" id="back5">−5 Sek</button>
-      <button type="button" id="play">▶ Abspielen</button>
-      <button type="button" id="fwd5">+5 Sek</button>
-      <button type="button" id="fwd10">+10 Sek</button>
+    <h1 class="hq-screen-title">Welche <span class="accent">Folge?</span></h1>
+    <div class="player" id="player">
+      <div class="player__head">
+        <span>5-Sek-Ausschnitt</span>
+        <span class="player__dot" aria-hidden="true"></span>
+      </div>
+      <div class="player__progress" aria-hidden="true">
+        <span class="player__bar" id="progress"></span>
+      </div>
+      <div class="controls">
+        <button type="button" id="back10">−10s</button>
+        <button type="button" id="back5">−5s</button>
+        <button type="button" id="play">▶ Abspielen</button>
+        <button type="button" id="fwd5">+5s</button>
+        <button type="button" id="fwd10">+10s</button>
+      </div>
     </div>
     <button type="button" class="secondary" id="skip">⏭ Andere Folge</button>
-    <label for="guess">Folgennummer</label>
-    <input type="text" inputmode="numeric" maxlength="3" id="guess" placeholder="z. B. 42" autocomplete="off" />
+    <div class="field">
+      <label for="guess">Folgennummer</label>
+      <input type="text" inputmode="numeric" maxlength="3" id="guess" placeholder="z. B. 42" autocomplete="off" />
+    </div>
     <button type="button" id="check">Antwort prüfen</button>
     <div id="status" class="status" role="status" aria-live="polite"></div>
   `)
@@ -170,10 +196,21 @@ function clearErrorOnInput(): void {
   if (!result.valid) setStatus(result.error, true)
 }
 
+function triggerProgress(): void {
+  const player = root.querySelector<HTMLElement>('#player')
+  if (!player) return
+  // Restart the CSS animation on every play: remove → reflow → re-add.
+  // The fill animates 0→100% over 5s (matches CLIP_MS = 5000ms in ../types).
+  player.classList.remove('is-playing')
+  void player.offsetWidth
+  player.classList.add('is-playing')
+}
+
 async function playCurrentClip(): Promise<void> {
   if (!current) return
   const token = getAccessToken()
   if (!token) return
+  triggerProgress()
   setStatus('Wiedergabe läuft …')
   try {
     await playClip(token, positionToClip(current.tracks, current.positionMs))
@@ -205,11 +242,17 @@ function checkAnswer(): void {
 }
 
 function renderResult(message: string): void {
+  const numberMatch = message.match(/Folge (\d+)/)
+  const bigNumber = numberMatch
+    ? `<span class="folge-no" aria-hidden="true">${escapeHtml(numberMatch[1])}</span>`
+    : ''
   render(root, `
-    <h1>Ergebnis</h1>
-    <div class="result">${escapeHtml(message)}</div>
-    <button type="button" id="next">Nächstes Quiz</button>
-    <button type="button" class="secondary" id="home">Startseite</button>
+    <h1 class="hq-screen-title">Er<span class="accent">gebnis</span></h1>
+    <div class="result">${bigNumber}${escapeHtml(message)}</div>
+    <div class="stack">
+      <button type="button" id="next">Nächstes Quiz</button>
+      <button type="button" class="secondary" id="home">Startseite</button>
+    </div>
   `)
   root.querySelector('#next')!.addEventListener('click', () => void renderQuiz())
   root.querySelector('#home')!.addEventListener('click', () => (location.hash = '#/'))
