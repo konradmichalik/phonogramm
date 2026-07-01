@@ -80,6 +80,32 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
   und Titel bereits verrät. Den passenden Wert per Blick in die Tracklist des Albums bei
   Spotify ermitteln.
 
+### Folgen automatisch generieren
+
+Statt die Einträge manuell zu pflegen, kann `src/data/folgen.json` aus einer Spotify-Playlist
+generiert werden, die alle Folgen als Alben enthält (Standard: „Die Drei Fragezeichen (Alle
+Folgen: 001-239)", Playlist-ID `05WXW6fLpDY1P2gg1YqhbJ`). Das Skript liest die komplette
+Playlist, gruppiert die Tracks nach Album, leitet Folgennummer/Titel aus dem Albumnamen ab und
+erkennt eine führende „Inhaltsangabe"-Spur automatisch als `skipLeadingTracks`.
+
+Zum Ausführen wird ein gültiger Spotify-Zugriffstoken benötigt:
+
+1. In der App einloggen (Spotify-Login-Flow durchlaufen).
+2. In den Browser-DevTools die Konsole öffnen und ausführen:
+   `sessionStorage.getItem('hq.token')`
+3. Den Wert kopieren und das Skript damit starten:
+
+```bash
+SPOTIFY_TOKEN=<token> node scripts/generate-folgen.mjs [playlistId]
+# oder mit npm-Script (nutzt die Standard-Playlist):
+SPOTIFY_TOKEN=<token> npm run generate:folgen
+```
+
+Das Skript **überschreibt** `src/data/folgen.json` vollständig. Am Ende gibt es einen Bericht
+aus: Anzahl gefundener Alben, geschriebener Folgen, Folgen mit erkannter Inhaltsangabe,
+Nummern-Kollisionen sowie eine Liste nicht zuordenbarer Album-Namen — diese müssen anschließend
+manuell in die JSON-Datei ergänzt werden.
+
 ## Deployment (GitHub Pages)
 
 Das Projekt wird über `.github/workflows/deploy.yml` automatisch bei jedem Push auf `main`

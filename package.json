@@ -12,7 +12,8 @@
     "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run",
     "test:watch": "NODE_OPTIONS=--no-experimental-webstorage vitest",
     "coverage": "NODE_OPTIONS=--no-experimental-webstorage vitest run --coverage",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "generate:folgen": "node scripts/generate-folgen.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
