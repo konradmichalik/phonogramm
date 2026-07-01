@@ -233,27 +233,29 @@ async function searchAlbumRefs(token) {
   return [...refs.values()]
 }
 
+// The batch endpoint (/albums?ids=…) is blocked with 403 on some app tiers, so
+// fetch each album's tracks individually via /albums/{id}/tracks — the same
+// endpoint the app uses successfully at runtime.
 async function fetchAlbumsWithTracks(albumRefs, token) {
   const albums = new Map()
-  const batchSize = 20
+  let done = 0
 
-  for (let i = 0; i < albumRefs.length; i += batchSize) {
-    const batch = albumRefs.slice(i, i + batchSize)
-    const ids = batch.map((ref) => ref.id).join(',')
-    const url = `https://api.spotify.com/v1/albums?ids=${ids}&market=DE`
-    const data = await spotifyFetch(url, token)
+  for (const ref of albumRefs) {
+    const data = await spotifyFetch(
+      `https://api.spotify.com/v1/albums/${ref.id}/tracks?limit=50`,
+      token,
+    )
+    albums.set(ref.id, {
+      albumId: ref.id,
+      name: ref.name,
+      tracks: data.items ?? [],
+      totalTracks: data.total ?? data.items?.length ?? 0,
+    })
 
-    for (const album of data.albums ?? []) {
-      if (!album?.id) continue
-      albums.set(album.id, {
-        albumId: album.id,
-        name: album.name,
-        tracks: album.tracks?.items ?? [],
-        totalTracks: album.total_tracks ?? album.tracks?.items?.length ?? 0,
-      })
+    done += 1
+    if (done % 25 === 0 || done === albumRefs.length) {
+      console.log(`Album-Tracks geladen: ${done}/${albumRefs.length}`)
     }
-
-    console.log(`Alben-Details geladen: ${Math.min(i + batchSize, albumRefs.length)}/${albumRefs.length}`)
   }
 
   return albums
