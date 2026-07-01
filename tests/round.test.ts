@@ -43,7 +43,7 @@ test('startRound caches tracks by albumId', async () => {
     })
 
   // First call should fetch tracks
-  const round1 = await startRoundWithCache()
+  await startRoundWithCache()
   expect(callCount).toBe(1)
 
   // Second call with same albumId should use cache

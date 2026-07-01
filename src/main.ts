@@ -1,2 +1,4 @@
-const app = document.querySelector<HTMLDivElement>('#app')!
-app.textContent = '??? Hörspiel-Quiz'
+import './styles.css'
+import { mountApp } from './ui/app'
+
+mountApp(document.querySelector<HTMLDivElement>('#app')!)
