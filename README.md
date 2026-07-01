@@ -66,9 +66,8 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 
 ```json
 {
-  "defaultIntroEndMs": 35000,
   "folgen": [
-    { "nummer": 125, "titel": "Feuermond", "albumId": "<echte Spotify-Album-ID>" }
+    { "nummer": 239, "titel": "Das Geheimnis der sieben Palmen", "albumId": "<echte Spotify-Album-ID>", "skipLeadingTracks": 1 }
   ]
 }
 ```
@@ -76,9 +75,6 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 - `albumId`: Spotify-Album-ID der jeweiligen Hörspielfolge (zu finden über „Link teilen" →
   „Album-Link kopieren" in Spotify).
 - `titel` / `nummer`: Anzeigename und Folgennummer für die Auflösung im Quiz.
-- `introEndMs` (optional, pro Folge): Millisekunden-Zeitpunkt, an dem das Intro endet.
-  Überschreibt den globalen `defaultIntroEndMs`-Wert für Modus 1 und kann bei Bedarf pro
-  Folge feinjustiert werden, falls das Intro kürzer oder länger als üblich ist.
 - `skipLeadingTracks` (optional, Standard `0`): Entfernt die ersten N Tracks aus dem
   spielbaren Zeitstrahl (betrifft beide Modi) — etwa eine „Inhaltsangabe"-Spur, die Folgennummer
   und Titel bereits verrät. Den passenden Wert per Blick in die Tracklist des Albums bei
