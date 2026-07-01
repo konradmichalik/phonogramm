@@ -13,6 +13,9 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const ARTIST_NAME = 'Die drei ???'
+// Bekannte Episode (Folge 239). Der echte Künstler wird aus diesem Album
+// abgeleitet, weil die Namenssuche viele leere "Die drei ???"-Dubletten liefert.
+const SEED_ALBUM_ID = '2mh0BDhRAJFa7clABwut3L'
 const SYNOPSIS_PATTERN = /inhaltsangabe|zusammenfassung/i
 const SERIES_PREFIX_PATTERN = /^die\s+drei\s+(\?{3}|fragezeichen)\s*/i
 const LEADING_LABEL_PATTERN = /^(folge|fall)\s*/i
@@ -129,6 +132,18 @@ async function resolveArtistId(token) {
     return { id: process.env.SPOTIFY_ARTIST_ID, name: '(aus SPOTIFY_ARTIST_ID)', followers: null }
   }
 
+  // Zuverlässig: den echten Künstler aus einem bekannten Episoden-Album ableiten.
+  try {
+    const album = await spotifyFetch(
+      `https://api.spotify.com/v1/albums/${SEED_ALBUM_ID}?market=DE`,
+      token,
+    )
+    const artist = album.artists?.find((a) => /drei/i.test(a.name)) ?? album.artists?.[0]
+    if (artist?.id) return { id: artist.id, name: artist.name, followers: null }
+  } catch {
+    // Fällt unten auf die Namenssuche zurück.
+  }
+
   const url = `https://api.spotify.com/v1/search?type=artist&limit=10&q=${encodeURIComponent(ARTIST_NAME)}`
   const data = await spotifyFetch(url, token)
   const artist = pickArtist(data.artists?.items ?? [])
@@ -147,7 +162,7 @@ async function fetchAllAlbumRefs(artistId, token) {
   const refs = new Map()
   let url =
     `https://api.spotify.com/v1/artists/${artistId}/albums` +
-    `?include_groups=album&limit=50&market=DE`
+    `?include_groups=album&limit=20&market=DE`
 
   while (url) {
     const data = await spotifyFetch(url, token)
