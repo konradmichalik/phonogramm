@@ -8,7 +8,7 @@ test('Quiz-Flow mit gemocktem Spotify', async ({ page }) => {
   await page.route('**/v1/me/player/play**', (r) => r.fulfill({ status: 204, body: '' }))
   await page.route('**/v1/me/player/pause**', (r) => r.fulfill({ status: 204, body: '' }))
 
-  // Deterministically pick the first Folge (Nr. 125) instead of a random one.
+  // Deterministically pick the first Folge instead of a random one.
   await page.addInitScript(() => {
     Math.random = () => 0
   })
@@ -23,7 +23,9 @@ test('Quiz-Flow mit gemocktem Spotify', async ({ page }) => {
   await expect(page.locator('#play')).toBeVisible()
   await page.fill('#guess', '125')
   await page.click('#check')
-  await expect(page.locator('.result')).toContainText('Folge 125')
+  // Data-independent: the result screen shows the sought "Folge <Nr> – <Titel>",
+  // regardless of which episodes are configured in folgen.json.
+  await expect(page.locator('.result')).toContainText(/Folge \d+ – /)
 })
 
 test('ungültige Eingabe zeigt Fehler', async ({ page }) => {
