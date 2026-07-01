@@ -96,7 +96,10 @@ async function fetchPlaylistTracks(playlistId, token) {
     }
 
     if (!response.ok) {
-      throw new Error(`Spotify API Fehler: HTTP ${response.status}`)
+      const body = await response.text().catch(() => '')
+      throw new Error(
+        `Spotify API Fehler: HTTP ${response.status}\nURL: ${url}\nAntwort: ${body || '(kein Body)'}`,
+      )
     }
 
     const data = await response.json()
