@@ -3,7 +3,7 @@
   --surface: #1a1a1f;
   --accent: #d10a11;
   --text: #f5f5f5;
-  --muted: #9a9aa2;
+  --muted: #b9b9c2;
 }
 * { box-sizing: border-box; }
 body {
@@ -32,7 +32,7 @@ label {
   margin-bottom: 12px;
   font-size: 1.05rem;
 }
-input[type="number"], input[inputmode="numeric"] {
+input[inputmode="numeric"] {
   width: 100%;
   min-height: 56px;
   font-size: 1.5rem;
@@ -44,7 +44,7 @@ input[type="number"], input[inputmode="numeric"] {
   margin-bottom: 12px;
 }
 .status { min-height: 1.5em; color: var(--muted); margin: 12px 0; }
-.error { color: var(--accent); }
+.error { color: #ff5c61; }
 .result { white-space: pre-line; font-size: 1.25rem; margin: 16px 0; }
 button:focus-visible, input:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .fade { transition: opacity 0.3s ease; }

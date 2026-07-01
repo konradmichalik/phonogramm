@@ -15,11 +15,14 @@ export const SPOTIFY_CONFIG: AuthConfig = {
 export function getAccessToken(): string | null {
   const token = sessionStorage.getItem(T_KEY)
   const expires = Number(sessionStorage.getItem(E_KEY) ?? 0)
-  if (!token || Date.now() >= expires) return null
+  if (!token || !Number.isFinite(expires) || Date.now() >= expires) return null
   return token
 }
 
 export async function beginLogin(cfg: AuthConfig): Promise<void> {
+  if (!cfg.clientId) {
+    throw new Error('Spotify Client ID fehlt — bitte VITE_SPOTIFY_CLIENT_ID in .env setzen.')
+  }
   const verifier = generateCodeVerifier()
   sessionStorage.setItem(V_KEY, verifier)
   location.assign(await buildAuthUrl(cfg, verifier))

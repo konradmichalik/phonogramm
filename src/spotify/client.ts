@@ -11,10 +11,17 @@ export class NoActiveDeviceError extends Error {
 const authHeaders = (token: string) => ({ Authorization: `Bearer ${token}` })
 
 export async function getAlbumTracks(albumId: string, token: string): Promise<Track[]> {
-  const res = await fetch(`${API}/albums/${albumId}/tracks?limit=50`, { headers: authHeaders(token) })
-  if (!res.ok) throw new Error(`Album-Tracks laden fehlgeschlagen (${res.status})`)
-  const data = (await res.json()) as { items: Array<{ uri: string; duration_ms: number }> }
-  return data.items.map((t) => ({ uri: t.uri, durationMs: t.duration_ms }))
+  const limit = 50
+  const items: Array<{ uri: string; duration_ms: number }> = []
+  let url: string | null = `${API}/albums/${albumId}/tracks?limit=${limit}`
+  while (url) {
+    const res: Response = await fetch(url, { headers: authHeaders(token) })
+    if (!res.ok) throw new Error(`Album-Tracks laden fehlgeschlagen (${res.status})`)
+    const data: { items: Array<{ uri: string; duration_ms: number }>; next: string | null } = await res.json()
+    items.push(...data.items)
+    url = data.next ?? (data.items.length === limit ? `${API}/albums/${albumId}/tracks?limit=${limit}&offset=${items.length}` : null)
+  }
+  return items.map((t) => ({ uri: t.uri, durationMs: t.duration_ms }))
 }
 
 export async function getActiveDeviceId(token: string): Promise<string | null> {

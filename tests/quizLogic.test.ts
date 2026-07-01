@@ -11,6 +11,10 @@ test('pickRandomFolge wählt anhand rng', () => {
   expect(pickRandomFolge(folgen, () => 0.99).nummer).toBe(2)
 })
 
+test('pickRandomFolge klemmt Index bei rng() === 1', () => {
+  expect(pickRandomFolge(folgen, () => 1).nummer).toBe(2)
+})
+
 test('evaluateAnswer korrekt', () => {
   const r = evaluateAnswer(125, { nummer: 125, titel: 'Feuermond', albumId: 'x' })
   expect(r.correct).toBe(true)

@@ -48,9 +48,17 @@ function renderStart(): void {
   `)
   root.querySelector('#settings')!.addEventListener('click', () => (location.hash = '#/settings'))
   root.querySelector('#start')!.addEventListener('click', () => {
-    if (!getAccessToken()) return void beginLogin(SPOTIFY_CONFIG)
+    if (!getAccessToken()) return void startLogin()
     location.hash = '#/quiz'
   })
+}
+
+async function startLogin(): Promise<void> {
+  try {
+    await beginLogin(SPOTIFY_CONFIG)
+  } catch (e) {
+    setStatus(e instanceof Error ? e.message : 'Login fehlgeschlagen.', true)
+  }
 }
 
 function renderSettings(): void {
