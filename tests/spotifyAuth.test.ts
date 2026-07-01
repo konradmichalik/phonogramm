@@ -1,7 +1,8 @@
-import { getAccessToken, exchangeCodeForToken, beginLogin } from '../src/auth/spotifyAuth'
+import { getAccessToken, exchangeCodeForToken, beginLogin, getSpotifyConfig } from '../src/auth/spotifyAuth'
 
 beforeEach(() => {
   sessionStorage.clear()
+  localStorage.clear()
   vi.restoreAllMocks()
 })
 
@@ -40,9 +41,14 @@ test('beginLogin wirft bei leerer clientId und ruft location.assign nicht auf', 
   try {
     await expect(
       beginLogin({ clientId: '', redirectUri: 'https://ex.org/cb', scopes: [] }),
-    ).rejects.toThrow('Spotify Client ID fehlt')
+    ).rejects.toThrow('Keine Spotify Client ID hinterlegt')
     expect(assignSpy).not.toHaveBeenCalled()
   } finally {
     Object.defineProperty(window, 'location', { value: originalLocation, configurable: true })
   }
+})
+
+test('getSpotifyConfig: liefert Client ID aus localStorage bevorzugt vor env', () => {
+  localStorage.setItem('hq.clientId', 'from-localstorage')
+  expect(getSpotifyConfig().clientId).toBe('from-localstorage')
 })

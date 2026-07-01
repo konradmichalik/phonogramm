@@ -1,17 +1,21 @@
 import folgenJson from '../data/folgen.json'
 import { parseFolgenData } from '../data/folgenSchema'
-import { beginLogin, exchangeCodeForToken, getAccessToken, SPOTIFY_CONFIG } from '../auth/spotifyAuth'
+import { beginLogin, exchangeCodeForToken, getAccessToken, getSpotifyConfig } from '../auth/spotifyAuth'
 import { getAlbumTracks, NoActiveDeviceError } from '../spotify/client'
 import { playClip as realPlayClip } from '../spotify/playback'
 import { startRound, type Round } from '../quiz/round'
 import { evaluateAnswer } from '../quiz/quizLogic'
 import { validateGuess } from '../quiz/validateGuess'
-import { getMode, setMode } from '../state/settings'
+import { getClientId, getMode, setClientId, setMode } from '../state/settings'
 import { render, setStatus } from './render'
 
 const data = parseFolgenData(folgenJson)
 let root: HTMLElement
 let current: Round | null = null
+
+function escapeAttr(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
+}
 
 export function mountApp(el: HTMLElement): void {
   root = el
@@ -24,7 +28,7 @@ async function handleRedirect(): Promise<void> {
   const code = params.get('code')
   if (code) {
     try {
-      await exchangeCodeForToken(code, SPOTIFY_CONFIG)
+      await exchangeCodeForToken(code, getSpotifyConfig())
     } finally {
       history.replaceState({}, '', import.meta.env.BASE_URL)
     }
@@ -48,14 +52,22 @@ function renderStart(): void {
   `)
   root.querySelector('#settings')!.addEventListener('click', () => (location.hash = '#/settings'))
   root.querySelector('#start')!.addEventListener('click', () => {
-    if (!getAccessToken()) return void startLogin()
-    location.hash = '#/quiz'
+    if (getAccessToken()) {
+      location.hash = '#/quiz'
+      return
+    }
+    if (getSpotifyConfig().clientId === '') {
+      setStatus('Keine Spotify Client ID hinterlegt — bitte trage sie in den Einstellungen ein.', true)
+      location.hash = '#/settings'
+      return
+    }
+    void startLogin()
   })
 }
 
 async function startLogin(): Promise<void> {
   try {
-    await beginLogin(SPOTIFY_CONFIG)
+    await beginLogin(getSpotifyConfig())
   } catch (e) {
     setStatus(e instanceof Error ? e.message : 'Login fehlgeschlagen.', true)
   }
@@ -74,11 +86,21 @@ function renderSettings(): void {
         <input type="radio" id="mode-random" name="mode" value="random" ${mode === 'random' ? 'checked' : ''}/> Zufälliger Ausschnitt
       </label>
     </fieldset>
+    <fieldset>
+      <legend>Spotify-Verbindung</legend>
+      <label for="client-id">Spotify Client ID</label>
+      <input type="text" id="client-id" autocomplete="off" spellcheck="false" value="${escapeAttr(getClientId())}" />
+      <p class="hint">Die Client ID erhältst du im <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noreferrer noopener">Spotify Developer Dashboard</a>. Trage dort als Redirect-URI <code>${location.origin}${import.meta.env.BASE_URL}</code> ein.</p>
+    </fieldset>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
     <button type="button" class="secondary" id="back">Zurück</button>
   `)
   root.querySelectorAll<HTMLInputElement>('input[name="mode"]').forEach((r) =>
     r.addEventListener('change', () => setMode(r.value as 'start' | 'random')),
   )
+  const clientIdInput = root.querySelector<HTMLInputElement>('#client-id')!
+  clientIdInput.addEventListener('input', () => setClientId(clientIdInput.value))
+  clientIdInput.addEventListener('change', () => setStatus('Client ID gespeichert.'))
   root.querySelector('#back')!.addEventListener('click', () => (location.hash = '#/'))
 }
 

@@ -1,4 +1,5 @@
 import { buildAuthUrl, generateCodeVerifier } from './pkce'
+import { getClientId } from '../state/settings'
 
 export interface AuthConfig { clientId: string; redirectUri: string; scopes: string[] }
 
@@ -6,10 +7,12 @@ const T_KEY = 'hq.token'
 const E_KEY = 'hq.expires'
 const V_KEY = 'hq.verifier'
 
-export const SPOTIFY_CONFIG: AuthConfig = {
-  clientId: import.meta.env.VITE_SPOTIFY_CLIENT_ID ?? '',
-  redirectUri: `${location.origin}${import.meta.env.BASE_URL}`,
-  scopes: ['user-read-playback-state', 'user-modify-playback-state'],
+export function getSpotifyConfig(): AuthConfig {
+  return {
+    clientId: getClientId() || (import.meta.env.VITE_SPOTIFY_CLIENT_ID ?? ''),
+    redirectUri: `${location.origin}${import.meta.env.BASE_URL}`,
+    scopes: ['user-read-playback-state', 'user-modify-playback-state'],
+  }
 }
 
 export function getAccessToken(): string | null {
@@ -21,7 +24,7 @@ export function getAccessToken(): string | null {
 
 export async function beginLogin(cfg: AuthConfig): Promise<void> {
   if (!cfg.clientId) {
-    throw new Error('Spotify Client ID fehlt — bitte VITE_SPOTIFY_CLIENT_ID in .env setzen.')
+    throw new Error('Keine Spotify Client ID hinterlegt — bitte trage sie in den Einstellungen ein.')
   }
   const verifier = generateCodeVerifier()
   sessionStorage.setItem(V_KEY, verifier)
