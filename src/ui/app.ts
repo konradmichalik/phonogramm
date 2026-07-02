@@ -168,11 +168,9 @@ function renderStart(): void {
     <p class="pg-sub">Untersuche die Fälle. Errate die Folge an einem kurzen Ausschnitt.</p>
     <div class="stack">
       <button type="button" id="start">Neues Quiz ${ICON_ARROW}</button>
-      <button type="button" class="secondary" id="settings">${ICON_GEAR} Einstellungen</button>
     </div>
     <div id="status" class="status" role="status" aria-live="polite"></div>
   `)
-  root.querySelector('#settings')!.addEventListener('click', () => goToSettings('#/'))
   root.querySelector('#start')!.addEventListener('click', () => {
     session = createSession()
     if (getAccessToken()) {
