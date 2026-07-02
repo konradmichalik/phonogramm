@@ -33,3 +33,16 @@ export async function playClip(
   await d.wait(clipMs)
   await d.pausePlayback(token, deviceId)
 }
+
+// Starts playback at the given position and lets it keep playing (no auto-pause) —
+// used for "Weiterhören" after the round is revealed.
+export async function playFrom(
+  token: string,
+  clip: ClipPosition,
+  deps: Partial<PlaybackDeps> = {},
+): Promise<void> {
+  const d = { ...defaultDeps, ...deps }
+  const deviceId = await d.getActiveDeviceId(token)
+  if (!deviceId) throw new NoActiveDeviceError()
+  await d.playClipRequest(token, { deviceId, uris: [clip.trackUri], positionMs: clip.positionMs })
+}
