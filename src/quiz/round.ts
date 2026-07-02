@@ -1,4 +1,4 @@
-import type { Folge, Mode, Track } from '../types'
+import { CLIP_MS, type Folge, type Mode, type Track } from '../types'
 import { pickRandomFolge } from './quizLogic'
 import { initialPosition, introEndMs } from './timeline'
 
@@ -9,6 +9,7 @@ export interface StartRoundDeps {
   getAlbumTracks: (albumId: string, token: string) => Promise<Track[]>
   excludeAlbumIds?: string[]
   rng?: () => number
+  clipMs?: number
 }
 
 export interface Round {
@@ -47,6 +48,7 @@ export async function startRound(deps: StartRoundDeps): Promise<Round> {
         tracks: playable,
         rng: deps.rng,
         startOffsetMs: introEndMs(folge.nummer),
+        clipMs: deps.clipMs ?? CLIP_MS,
       })
       return { folge, tracks: playable, positionMs }
     } catch (error) {

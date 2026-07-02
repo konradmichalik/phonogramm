@@ -89,3 +89,24 @@ test('positionToClip: mitten im zweiten Track', () => {
 test('positionToClip: mitten im dritten Track', () => {
   expect(positionToClip(A, 190000)).toEqual({ trackUri: 't2', positionMs: 10000 })
 })
+
+test('scrub: klemmt am oberen Rand mit custom clipMs', () => {
+  const maxPosition = totalDurationMs(A) - 20000
+  expect(scrub(maxPosition + 5000, 10000, A, 20000)).toBe(maxPosition)
+})
+
+test('positionToClip: hinter dem Ende mit custom clipMs klemmt auf lastTrack.durationMs - clipMs', () => {
+  const total = totalDurationMs(A)
+  const lastTrack = A[A.length - 1]
+  expect(positionToClip(A, total + 1000, 20000)).toEqual({
+    trackUri: lastTrack.uri,
+    positionMs: Math.max(0, lastTrack.durationMs - 20000),
+  })
+})
+
+test('initialPosition start: klemmt startOffsetMs auf total - custom clipMs', () => {
+  const shortTracks: Track[] = [{ uri: 's0', durationMs: 20000 }]
+  expect(initialPosition({ mode: 'start', tracks: shortTracks, startOffsetMs: 42000, clipMs: 15000 })).toBe(
+    totalDurationMs(shortTracks) - 15000,
+  )
+})

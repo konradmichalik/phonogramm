@@ -7,8 +7,7 @@ import { startRound, type Round } from '../quiz/round'
 import { evaluateAnswer } from '../quiz/quizLogic'
 import { positionToClip, scrub } from '../quiz/timeline'
 import { validateGuess } from '../quiz/validateGuess'
-import { getClientId, getMode, setClientId, setMode } from '../state/settings'
-import { CLIP_MS } from '../types'
+import { CLIP_PRESETS_MS, getClientId, getClipMs, getMode, setClientId, setClipMs, setMode } from '../state/settings'
 import { render, setStatus } from './render'
 
 const data = parseFolgenData(folgenJson)
@@ -106,7 +105,7 @@ function renderStart(): void {
       </div>
       <span class="hq-tag" aria-hidden="true">Fall: 001</span>
     </div>
-    <p class="hq-sub">Untersuche die Fälle. Errate die Folge am 10-Sekunden-Ausschnitt.</p>
+    <p class="hq-sub">Untersuche die Fälle. Errate die Folge an einem kurzen Ausschnitt.</p>
     <div class="stack">
       <button type="button" id="start">Neues Quiz ${ICON_ARROW}</button>
       <button type="button" class="secondary" id="settings">${ICON_GEAR} Einstellungen</button>
@@ -138,6 +137,7 @@ async function startLogin(): Promise<void> {
 
 function renderSettings(): void {
   const mode = getMode()
+  const clipMs = getClipMs()
   render(root, `
     <h1 class="hq-screen-title">Einstellungen</h1>
     <div class="hq-hero-wrap">
@@ -146,17 +146,29 @@ function renderSettings(): void {
       </div>
     </div>
     <fieldset>
-      <legend class="section-label">${ICON_SLIDERS} Quiz-Modus</legend>
+      <legend class="section-label">${ICON_SLIDERS} Spielmodus</legend>
       <label class="mode-card" for="mode-start">
         <input type="radio" id="mode-start" name="mode" value="start" ${mode === 'start' ? 'checked' : ''}/>
-        <span class="mode-card__title">Folgenbeginn</span>
-        <span class="mode-card__desc">Rate die Folge direkt nach dem Intro – mit den ±-Tasten feinjustieren.</span>
+        <span class="mode-card__title">Normal</span>
+        <span class="mode-card__desc">Start der Folge – direkt nach dem Intro.</span>
       </label>
       <label class="mode-card" for="mode-random">
         <input type="radio" id="mode-random" name="mode" value="random" ${mode === 'random' ? 'checked' : ''}/>
-        <span class="mode-card__title">Zufällige Mitte</span>
-        <span class="mode-card__desc">Eine zufällige Stelle aus der Mitte. Nur für echte Profis.</span>
+        <span class="mode-card__title">Advanced</span>
+        <span class="mode-card__desc">Irgendwo mitten in der Folge. Nur für Profis.</span>
       </label>
+    </fieldset>
+    <hr class="divider" />
+    <fieldset>
+      <legend class="section-label">${ICON_SLIDERS} Ausschnitt-Länge</legend>
+      <div class="length-chips" role="radiogroup" aria-label="Ausschnitt-Länge">
+        ${CLIP_PRESETS_MS.map((ms) => `
+          <label class="length-chip" for="clip-${ms}">
+            <input type="radio" id="clip-${ms}" name="cliplen" value="${ms}" ${clipMs === ms ? 'checked' : ''}/>
+            <span>${ms / 1000}s</span>
+          </label>
+        `).join('')}
+      </div>
     </fieldset>
     <hr class="divider" />
     <div>
@@ -174,6 +186,12 @@ function renderSettings(): void {
   root.querySelectorAll<HTMLInputElement>('input[name="mode"]').forEach((r) =>
     r.addEventListener('change', () => setMode(r.value as 'start' | 'random')),
   )
+  root.querySelectorAll<HTMLInputElement>('input[name="cliplen"]').forEach((r) =>
+    r.addEventListener('change', () => {
+      setClipMs(Number(r.value))
+      setStatus(`Ausschnitt-Länge: ${Number(r.value) / 1000}s gespeichert.`)
+    }),
+  )
   const clientIdInput = root.querySelector<HTMLInputElement>('#client-id')!
   clientIdInput.addEventListener('input', () => setClientId(clientIdInput.value))
   clientIdInput.addEventListener('change', () => setStatus('Client ID gespeichert.'))
@@ -188,6 +206,7 @@ async function loadRound(token: string): Promise<boolean> {
       token,
       getAlbumTracks,
       excludeAlbumIds: lastAlbumId ? [lastAlbumId] : [],
+      clipMs: getClipMs(),
     })
     lastAlbumId = current.folge.albumId
     return true
@@ -200,6 +219,7 @@ async function loadRound(token: string): Promise<boolean> {
 async function renderQuiz(): Promise<void> {
   const token = getAccessToken()
   if (!token) return void (location.hash = '#/')
+  const clipMs = getClipMs()
   render(root, `
     ${HEADER}
     <div class="player" id="player">
@@ -208,7 +228,7 @@ async function renderQuiz(): Promise<void> {
       </div>
       <div class="player__head">
         <p class="player__caseno">Fall #???</p>
-        <p class="player__status">Status: Ermittlung läuft</p>
+        <p class="player__status">Status: Ermittlung läuft — ${clipMs / 1000}-Sek-Ausschnitt</p>
       </div>
       <div class="player__progress" aria-hidden="true">
         <span class="player__bar" id="progress"></span>
@@ -258,9 +278,9 @@ function triggerProgress(): void {
   const player = root.querySelector<HTMLElement>('#player')
   if (!player) return
   // Restart the CSS animation on every play: remove → reflow → re-add.
-  // The fill duration is driven by --clip-ms (set from CLIP_MS in ../types),
-  // so it always matches the actual clip length regardless of CLIP_MS's value.
-  player.style.setProperty('--clip-ms', `${CLIP_MS}ms`)
+  // The fill duration is driven by --clip-ms (set from the configured clip
+  // length), so it always matches the actual clip length being played.
+  player.style.setProperty('--clip-ms', `${getClipMs()}ms`)
   player.classList.remove('is-playing')
   void player.offsetWidth
   player.classList.add('is-playing')
@@ -270,10 +290,11 @@ async function playCurrentClip(): Promise<void> {
   if (!current) return
   const token = getAccessToken()
   if (!token) return
+  const clipMs = getClipMs()
   triggerProgress()
   setStatus('Wiedergabe läuft …')
   try {
-    await playClip(token, positionToClip(current.tracks, current.positionMs))
+    await playClip(token, positionToClip(current.tracks, current.positionMs, clipMs), { clipMs })
     setStatus('Fertig. Deine Antwort?')
   } catch (e) {
     setStatus(e instanceof NoActiveDeviceError
@@ -284,7 +305,7 @@ async function playCurrentClip(): Promise<void> {
 
 async function scrubAndPlay(stepMs: number): Promise<void> {
   if (!current) return
-  current = { ...current, positionMs: scrub(current.positionMs, stepMs, current.tracks) }
+  current = { ...current, positionMs: scrub(current.positionMs, stepMs, current.tracks, getClipMs()) }
   await playCurrentClip()
 }
 

@@ -20,11 +20,16 @@ const defaultDeps: PlaybackDeps = {
   wait: (ms) => new Promise((r) => setTimeout(r, ms)),
 }
 
-export async function playClip(token: string, clip: ClipPosition, deps: Partial<PlaybackDeps> = {}): Promise<void> {
+export async function playClip(
+  token: string,
+  clip: ClipPosition,
+  deps: Partial<PlaybackDeps> & { clipMs?: number } = {},
+): Promise<void> {
   const d = { ...defaultDeps, ...deps }
+  const clipMs = deps.clipMs ?? CLIP_MS
   const deviceId = await d.getActiveDeviceId(token)
   if (!deviceId) throw new NoActiveDeviceError()
   await d.playClipRequest(token, { deviceId, uris: [clip.trackUri], positionMs: clip.positionMs })
-  await d.wait(CLIP_MS)
+  await d.wait(clipMs)
   await d.pausePlayback(token, deviceId)
 }
