@@ -13,7 +13,7 @@ test('setMode persistiert', () => {
 })
 
 test('ungültiger gespeicherter Wert -> Default', () => {
-  localStorage.setItem('hq.mode', 'müll')
+  localStorage.setItem('phonogramm.mode', 'müll')
   expect(getMode()).toBe('start')
 })
 
@@ -42,11 +42,11 @@ test('setClipMs persistiert (round-trip)', () => {
 })
 
 test('getClipMs: Wert außerhalb der Presets -> Default 10000', () => {
-  localStorage.setItem('hq.clipMs', '7000')
+  localStorage.setItem('phonogramm.clipMs', '7000')
   expect(getClipMs()).toBe(10000)
 })
 
 test('getClipMs: nicht-numerischer gespeicherter Wert -> Default 10000', () => {
-  localStorage.setItem('hq.clipMs', 'abc')
+  localStorage.setItem('phonogramm.clipMs', 'abc')
   expect(getClipMs()).toBe(10000)
 })

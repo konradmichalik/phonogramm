@@ -3,9 +3,9 @@ import { getClientId } from '../state/settings'
 
 export interface AuthConfig { clientId: string; redirectUri: string; scopes: string[] }
 
-const T_KEY = 'hq.token'
-const E_KEY = 'hq.expires'
-const V_KEY = 'hq.verifier'
+const T_KEY = 'phonogramm.token'
+const E_KEY = 'phonogramm.expires'
+const V_KEY = 'phonogramm.verifier'
 
 export function getSpotifyConfig(): AuthConfig {
   return {

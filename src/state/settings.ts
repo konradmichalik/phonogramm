@@ -1,8 +1,8 @@
 import { CLIP_MS, type Mode } from '../types'
 
-const KEY = 'hq.mode'
-const CLIENT_ID_KEY = 'hq.clientId'
-const CLIP_MS_KEY = 'hq.clipMs'
+const KEY = 'phonogramm.mode'
+const CLIENT_ID_KEY = 'phonogramm.clientId'
+const CLIP_MS_KEY = 'phonogramm.clipMs'
 
 export const CLIP_PRESETS_MS = [5000, 10000, 15000, 20000]
 
