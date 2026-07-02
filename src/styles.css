@@ -52,13 +52,13 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   padding:
-    calc(env(safe-area-inset-top) + 32px)
+    calc(env(safe-area-inset-top) + 20px)
     calc(env(safe-area-inset-right) + 22px)
-    calc(env(safe-area-inset-bottom) + 40px)
+    calc(env(safe-area-inset-bottom) + 24px)
     calc(env(safe-area-inset-left) + 22px);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   overflow: hidden; /* clip texture + hero geometry → no h-scroll */
 }
 
@@ -82,23 +82,27 @@ body {
 
 .pg-header {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--outline-variant);
 }
+.pg-header .icon-btn { flex: 0 0 auto; }
 
 .pg-titlebar {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 /* Tricolor ??? mark (own mark — NOT the franchise wordmark) */
 .pg-mark {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.6rem;
   line-height: 1;
   letter-spacing: 0.02em;
   margin: 0;
@@ -110,7 +114,7 @@ body {
 
 .pg-title {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.6rem;
   line-height: 1;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -209,7 +213,7 @@ body {
 }
 
 /* Album variant (player) — constructivist grid collage (SVG), nod to the ??? mark */
-.pg-hero--album { border-color: var(--blue); width: min(52vw, 190px); height: min(52vw, 190px); }
+.pg-hero--album { border-color: var(--blue); width: min(34vw, 116px); height: min(34vw, 116px); }
 /* SVG collage replaces the gradient collage + generic corner triangle here */
 .pg-hero--album::before { content: none; }
 .pg-hero--album::after { content: none; }
@@ -310,29 +314,15 @@ button svg { flex: 0 0 auto; }
 /* Compact icon button — overrides the full-width default */
 .icon-btn {
   width: auto;
-  min-width: var(--tap);
-  padding: 0 14px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
   background: transparent;
   color: var(--white);
   border: 2px solid var(--outline);
 }
 .icon-btn:hover, .icon-btn:focus-visible { border-color: var(--white); }
 
-/* --- Quiz top bar — current mode + settings shortcut --------------------- */
-.quiz-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.quiz-bar__mode {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--on-surface-variant);
-}
 
 /* --- Player card (evidence block, blue left accent) ----------------------- */
 
@@ -341,32 +331,21 @@ button svg { flex: 0 0 auto; }
   border: 1px solid var(--outline-variant);
   border-left: 4px solid var(--blue);
   border-radius: 0;
-  padding: 24px 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
 }
 
-.player__head {
-  text-align: center;
-}
 .player__caseno {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 1.4rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--white);
   margin: 0;
-}
-.player__status {
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--outline);
-  margin: 4px 0 0;
+  text-align: center;
 }
 
 /* Progress bar — thin (4px) SOLID BLUE fill over the clip length (--clip-ms) */
@@ -396,19 +375,18 @@ button svg { flex: 0 0 auto; }
   to   { width: 100%; }
 }
 
-/* Scrub controls — icon-based row */
+/* Transport row — scrub / play / scrub on one line */
 .controls {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 8px;
   width: 100%;
 }
-.controls button {
+.controls .scrub {
   flex: 1 1 0;
   min-width: 0;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-height: auto;
   padding: 4px 0;
   background: transparent;
@@ -419,17 +397,16 @@ button svg { flex: 0 0 auto; }
   letter-spacing: 0.05em;
   text-transform: none;
 }
-.controls button:hover { color: var(--white); }
+.controls .scrub:hover { color: var(--blue); }
 .controls .scrub-icon { display: block; }
-.controls #back10:hover, .controls #fwd10:hover { color: var(--blue); }
 
-/* Big play button — full-width solid red, triangle icon */
-#play {
-  width: 100%;
+/* Play button — centre of the transport row, solid red, triangle icon */
+.controls #play {
+  flex: 2 1 0;
   background: var(--red);
   color: var(--white);
 }
-#play:hover { background: #ff2338; }
+.controls #play:hover { background: #ff2338; }
 #play .play-tri {
   width: 0; height: 0;
   border-top: 9px solid transparent;
@@ -437,7 +414,13 @@ button svg { flex: 0 0 auto; }
   border-left: 15px solid currentColor;
 }
 
-/* Andere Folge — outlined, full width */
+/* Andere Folge / Beenden — outlined, side by side */
+.player__actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.player__actions button { flex: 1 1 0; min-width: 0; }
 #skip {
   background: transparent;
   border: 2px solid var(--outline);
@@ -452,14 +435,14 @@ button svg { flex: 0 0 auto; }
   border: 1px solid var(--outline-variant);
   border-left: 4px solid var(--red);
   border-radius: 0;
-  padding: 24px 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 .answer__q {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 7vw, 1.9rem);
+  font-size: clamp(1.25rem, 5.5vw, 1.5rem);
   line-height: 1;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -484,10 +467,10 @@ label {
 
 #guess {
   width: 100%;
-  min-height: 104px;
-  padding: 8px 0;
+  min-height: 72px;
+  padding: 4px 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 15vw, 4.5rem);
+  font-size: clamp(2.4rem, 12vw, 3.4rem);
   line-height: 1;
   letter-spacing: 0.12em;
   text-align: center;
@@ -501,7 +484,7 @@ label {
 }
 #guess::placeholder {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 15vw, 4.5rem);
+  font-size: clamp(2.4rem, 12vw, 3.4rem);
   letter-spacing: 0.12em;
   color: var(--outline-variant);
 }
