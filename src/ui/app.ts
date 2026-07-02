@@ -298,25 +298,21 @@ function checkAnswer(): void {
   const result = validateGuess(raw)
   if (!result.valid) return setStatus(result.error, true)
   const evalResult = evaluateAnswer(result.value, current.folge)
-  renderResult(evalResult.message)
+  renderResult(evalResult.correct, current.folge.nummer, current.folge.titel, evalResult.message)
 }
 
-function renderResult(message: string): void {
-  const correct = /^Richtig/.test(message)
+function renderResult(correct: boolean, nummer: number, titel: string, message: string): void {
   const headline = correct ? 'Richtig' : 'Leider nicht'
-  const match = message.match(/Folge (\d+) – ([^.\n]+)/)
-  const cards = match
-    ? `<div class="result-cards" aria-hidden="true">
+  const cards = `<div class="result-cards" aria-hidden="true">
          <div class="result-card result-card--no">
            <span class="result-card__label">Folge</span>
-           <span class="result-card__no">${escapeHtml(match[1])}</span>
+           <span class="result-card__no">${escapeHtml(String(nummer))}</span>
          </div>
          <div class="result-card result-card--file">
            <span class="result-card__label">Fall-Datei</span>
-           <span class="result-card__file">${escapeHtml(match[2].trim())}</span>
+           <span class="result-card__file">${escapeHtml(titel)}</span>
          </div>
        </div>`
-    : ''
   render(root, `
     ${HEADER}
     <p class="result-headline">${headline}</p>
