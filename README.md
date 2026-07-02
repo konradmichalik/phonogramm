@@ -1,133 +1,29 @@
 # 🎧 Phonogramm
 
-Ein browserbasiertes Quiz für Hörspielfans: Es spielt einen exakten 10-Sekunden-Ausschnitt
-aus einer Folge und du musst erraten, um welche Folge es sich handelt.
+> A browser-based quiz for audio-drama fans: it plays an exact 10-second snippet from an
+> episode and you have to guess which episode it is.
 
-Die Wiedergabe läuft über **Spotify Connect** — die Web-App selbst spielt keinen Ton,
-sondern steuert deine bereits geöffnete Spotify-App fern (als aktives Connect-Gerät),
-spielt den Ausschnitt exakt 10 Sekunden lang ab und pausiert danach automatisch wieder.
+Playback runs via **Spotify Connect** — the web app itself plays no audio; instead it
+remotely controls your already-open Spotify app (as the active Connect device), plays the
+snippet for exactly 10 seconds, then pauses again automatically.
 
-## Voraussetzungen
+> [!NOTE]
+> This is a private fun project.
 
-- **Spotify Premium** (Voraussetzung der Spotify-Playback-API für Fernsteuerung)
-- Die **Spotify-App muss auf einem Gerät geöffnet und aktiv sein** (Desktop, Mobile oder
-  Web-Player) — dieses Gerät wird als Connect-Ziel ferngesteuert. Ohne aktives Gerät kann
-  kein Clip abgespielt werden.
-- Ein moderner Browser (die Web-App selbst läuft rein clientseitig, kein eigener Player)
+## ⚙️ Requirements
 
-## Spielmodi
+> [!IMPORTANT]
+> Requires **Spotify Premium** and an already **open, active Spotify device** (desktop,
+> mobile, or web player) — the app remote-controls it as the Connect target. Without an
+> active device, no clip can be played.
 
-- **Modus 1 – Folgenbeginn**: Der Ausschnitt startet kurz nach dem Intro der Folge. Die
-  genaue Startzeit ist pro Folge über `startSeconds` in `src/data/folgen.json` einstellbar.
-- **Modus 2 – Zufälliger Ausschnitt**: Der Ausschnitt startet an einer zufälligen Stelle
-  aus der Mitte der Folge.
+- A modern browser (the app runs entirely client-side, with no built-in player)
 
-Der gewählte Modus wird im `localStorage` gemerkt und bleibt zwischen Sitzungen erhalten.
+## ✨ Game modes
 
-## Setup
+- **Mode 1 – Episode start**: The snippet starts shortly after the episode's intro. The exact
+  start time can be configured per episode via `startSeconds` in `src/data/folgen.json`.
+- **Mode 2 – Random snippet**: The snippet starts at a random point in the middle of the
+  episode.
 
-```bash
-npm install
-```
-
-Anschließend eine `.env`-Datei im Projektroot anlegen (siehe `.env.example`):
-
-```bash
-VITE_SPOTIFY_CLIENT_ID=deine_spotify_client_id
-```
-
-### Spotify Developer Dashboard
-
-1. Im [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) eine neue App
-   anlegen.
-2. Die **Client ID** aus den App-Einstellungen kopieren und in `.env` als
-   `VITE_SPOTIFY_CLIENT_ID` eintragen. Ein Client Secret wird **nicht** benötigt — die App
-   nutzt OAuth Authorization Code Flow mit PKCE.
-3. Unter „Redirect URIs" folgende URIs registrieren:
-   - **Lokal:** `http://127.0.0.1:5173/phonogramm/`
-     Spotify erlaubt seit einiger Zeit kein `http://localhost` mehr als Redirect-URI,
-     sondern nur noch die Loopback-IP `127.0.0.1`. Den Dev-Server deshalb explizit über
-     `http://127.0.0.1:5173/phonogramm/` öffnen, nicht über `localhost`.
-   - **Produktion:** `https://<dein-github-user>.github.io/phonogramm/`
-
-## Befehle
-
-```bash
-npm run dev      # Dev-Server starten (siehe Hinweis zu 127.0.0.1 oben)
-npm run build    # Typecheck + Produktionsbuild nach dist/
-npm test         # Unit-/Integrationstests (Vitest)
-npm run e2e      # End-to-End-Tests (Playwright)
-```
-
-## Folgen-Daten pflegen
-
-Die Liste der spielbaren Folgen liegt in `src/data/folgen.json`. Aktuell enthält sie
-Platzhalter-Werte (`"albumId": "PLATZHALTER_ALBUM_ID"`), die vor dem produktiven Einsatz
-durch echte Spotify-Album-IDs ersetzt werden müssen:
-
-```json
-{
-  "folgen": [
-    { "nummer": 239, "titel": "Das Geheimnis der sieben Palmen", "albumId": "<echte Spotify-Album-ID>", "startSeconds": 49, "skipLeadingTracks": 1 }
-  ]
-}
-```
-
-- `albumId`: Spotify-Album-ID der jeweiligen Hörspielfolge (zu finden über „Link teilen" →
-  „Album-Link kopieren" in Spotify).
-- `titel` / `nummer`: Anzeigename und Folgennummer für die Auflösung im Quiz.
-- `startSeconds` (optional, Standard `0`): Startsekunde für Modus 1 (Folgenbeginn), gemessen
-  ab Beginn des spielbaren Zeitstrahls (also nach `skipLeadingTracks`). Grober Richtwert ist
-  das Intro-Ende (~42 s für Folgen 1–124, ~49 s ab Folge 125); da ältere Folgen zusätzlich
-  einen Disclaimer und neuere einen Titelsong als Einzeltitel haben, lässt sich der Wert pro
-  Folge exakt justieren.
-- `skipLeadingTracks` (optional, Standard `0`): Entfernt die ersten N Tracks aus dem
-  spielbaren Zeitstrahl (betrifft beide Modi) — etwa eine „Inhaltsangabe"-Spur, die Folgennummer
-  und Titel bereits verrät. Den passenden Wert per Blick in die Tracklist des Albums bei
-  Spotify ermitteln.
-
-### Folgen automatisch generieren
-
-Statt die Einträge manuell zu pflegen, kann `src/data/folgen.json` aus dem kompletten
-Alben-Katalog des Spotify-Künstlers „Die drei ???" generiert werden. Das Skript sucht den
-Künstler automatisch, listet alle seine Alben, leitet Folgennummer/Titel aus jedem Albumnamen ab
-und erkennt eine führende „Inhaltsangabe"-Spur automatisch als `skipLeadingTracks`. Zusätzlich
-setzt es `startSeconds` auf den groben Intro-Richtwert (42 s bzw. 49 s), der anschließend pro
-Folge feinjustiert werden kann. Der
-Künstler-Katalog wird bewusst statt einer Playlist verwendet, da Lesezugriffe auf fremde
-öffentliche Playlists mit dem App-Token HTTP 403 liefern können — Künstler/Alben-Endpunkte
-funktionieren mit demselben Token zuverlässig.
-
-Zum Ausführen wird ein gültiger Spotify-Zugriffstoken benötigt:
-
-1. In der App einloggen (Spotify-Login-Flow durchlaufen).
-2. In den Browser-DevTools die Konsole öffnen und ausführen:
-   `sessionStorage.getItem('hq.token')`
-3. Den Wert kopieren und das Skript damit starten:
-
-```bash
-SPOTIFY_TOKEN=<token> npm run generate:folgen
-# optional: Künstlersuche überspringen und Künstler-ID direkt vorgeben
-SPOTIFY_TOKEN=<token> SPOTIFY_ARTIST_ID=<artistId> npm run generate:folgen
-```
-
-Das Skript **überschreibt** `src/data/folgen.json` vollständig. Am Ende gibt es einen Bericht
-aus: verwendeter Künstler, Anzahl gefundener Alben, geschriebener Folgen, Folgen mit erkannter
-Inhaltsangabe, Nummern-Kollisionen sowie eine Liste nicht zuordenbarer Album-Namen — diese müssen
-anschließend manuell in die JSON-Datei ergänzt werden.
-
-## Deployment (GitHub Pages)
-
-Das Projekt wird über `.github/workflows/deploy.yml` automatisch bei jedem Push auf `main`
-gebaut und auf GitHub Pages veröffentlicht. Einmalig einzurichten:
-
-1. GitHub-Repository unter dem Namen **`phonogramm`** anlegen (der Vite-`base`-Pfad
-   `/phonogramm/` in `vite.config.ts` geht von diesem Namen aus). Heißt das Repo anders,
-   muss `base` entsprechend angepasst werden.
-2. Unter **Settings → Secrets and variables → Actions → Variables** eine Repository-Variable
-   `SPOTIFY_CLIENT_ID` mit der eigenen Spotify-Client-ID anlegen. Der Workflow reicht sie
-   beim Build als `VITE_SPOTIFY_CLIENT_ID` durch — sie wird nie im Repository gespeichert.
-3. Unter **Settings → Pages** als Quelle **„GitHub Actions"** auswählen.
-4. Nach dem ersten erfolgreichen Deploy ist die App unter
-   `https://<dein-github-user>.github.io/phonogramm/` erreichbar. Diese URL muss wie
-   oben beschrieben auch als Redirect-URI im Spotify Dashboard hinterlegt sein.
+The selected mode is stored in `localStorage` and persists between sessions.
