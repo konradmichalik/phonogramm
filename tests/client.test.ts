@@ -1,4 +1,4 @@
-import { getAlbumTracks, getActiveDeviceId } from '../src/spotify/client'
+import { getAlbumTracks, getActiveDeviceId, getDevices } from '../src/spotify/client'
 
 beforeEach(() => vi.restoreAllMocks())
 
@@ -47,4 +47,31 @@ test('getActiveDeviceId gibt aktives Gerät zurück', async () => {
 test('getActiveDeviceId: null ohne Gerät', async () => {
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ devices: [] }), { status: 200 })))
   expect(await getActiveDeviceId('TOK')).toBeNull()
+})
+
+test('getActiveDeviceId: bevorzugtes Gerät wird verwendet, wenn verfügbar', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+    devices: [{ id: 'dev1', is_active: true }, { id: 'dev2', is_active: false }],
+  }), { status: 200 })))
+  expect(await getActiveDeviceId('TOK', 'dev2')).toBe('dev2')
+})
+
+test('getActiveDeviceId: bevorzugtes Gerät nicht verfügbar -> Fallback auf aktives Gerät', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+    devices: [{ id: 'dev1', is_active: true }, { id: 'dev2', is_active: false }],
+  }), { status: 200 })))
+  expect(await getActiveDeviceId('TOK', 'dev-unbekannt')).toBe('dev1')
+})
+
+test('getDevices mappt id, name, is_active', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+    devices: [
+      { id: 'dev1', name: 'MacBook Pro', is_active: true },
+      { id: 'dev2', name: 'iPhone', is_active: false },
+    ],
+  }), { status: 200 })))
+  expect(await getDevices('TOK')).toEqual([
+    { id: 'dev1', name: 'MacBook Pro', is_active: true },
+    { id: 'dev2', name: 'iPhone', is_active: false },
+  ])
 })

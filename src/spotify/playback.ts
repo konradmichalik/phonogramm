@@ -7,7 +7,7 @@ import {
 } from './client'
 
 export interface PlaybackDeps {
-  getActiveDeviceId: (token: string) => Promise<string | null>
+  getActiveDeviceId: (token: string, preferredDeviceId?: string) => Promise<string | null>
   playClipRequest: (token: string, opts: { deviceId: string; uris: string[]; positionMs: number }) => Promise<void>
   pausePlayback: (token: string, deviceId: string) => Promise<void>
   wait: (ms: number) => Promise<void>
@@ -23,11 +23,11 @@ const defaultDeps: PlaybackDeps = {
 export async function playClip(
   token: string,
   clip: ClipPosition,
-  deps: Partial<PlaybackDeps> & { clipMs?: number } = {},
+  deps: Partial<PlaybackDeps> & { clipMs?: number; preferredDeviceId?: string } = {},
 ): Promise<void> {
   const d = { ...defaultDeps, ...deps }
   const clipMs = deps.clipMs ?? CLIP_MS
-  const deviceId = await d.getActiveDeviceId(token)
+  const deviceId = await d.getActiveDeviceId(token, deps.preferredDeviceId)
   if (!deviceId) throw new NoActiveDeviceError()
   await d.playClipRequest(token, { deviceId, uris: [clip.trackUri], positionMs: clip.positionMs })
   await d.wait(clipMs)
@@ -39,10 +39,10 @@ export async function playClip(
 export async function playFrom(
   token: string,
   clip: ClipPosition,
-  deps: Partial<PlaybackDeps> = {},
+  deps: Partial<PlaybackDeps> & { preferredDeviceId?: string } = {},
 ): Promise<void> {
   const d = { ...defaultDeps, ...deps }
-  const deviceId = await d.getActiveDeviceId(token)
+  const deviceId = await d.getActiveDeviceId(token, deps.preferredDeviceId)
   if (!deviceId) throw new NoActiveDeviceError()
   await d.playClipRequest(token, { deviceId, uris: [clip.trackUri], positionMs: clip.positionMs })
 }

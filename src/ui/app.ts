@@ -1,14 +1,24 @@
 import folgenJson from '../data/folgen.json'
 import { parseFolgenData } from '../data/folgenSchema'
 import { beginLogin, exchangeCodeForToken, getAccessToken, getSpotifyConfig } from '../auth/spotifyAuth'
-import { getAlbumTracks, NoActiveDeviceError } from '../spotify/client'
+import { getAlbumTracks, getDevices, NoActiveDeviceError, type SpotifyDevice } from '../spotify/client'
 import { playClip, playFrom } from '../spotify/playback'
 import { startRound, type Round } from '../quiz/round'
 import { evaluateAnswer } from '../quiz/quizLogic'
 import { positionToClip, scrub } from '../quiz/timeline'
 import { validateGuess } from '../quiz/validateGuess'
 import { createSession, recordResult, type Session } from '../quiz/session'
-import { CLIP_PRESETS_MS, getClientId, getClipMs, getMode, setClientId, setClipMs, setMode } from '../state/settings'
+import {
+  CLIP_PRESETS_MS,
+  getClientId,
+  getClipMs,
+  getDeviceId,
+  getMode,
+  setClientId,
+  setClipMs,
+  setDeviceId,
+  setMode,
+} from '../state/settings'
 import { render, setStatus } from './render'
 
 const data = parseFolgenData(folgenJson)
@@ -17,8 +27,6 @@ let current: Round | null = null
 let lastAlbumId: string | null = null
 let settingsFrom = '#/'
 let session: Session = createSession()
-
-const MODE_LABELS = { start: 'Normal', random: 'Advanced' } as const
 
 function goToSettings(from: string): void {
   settingsFrom = from
@@ -35,6 +43,9 @@ function escapeHtml(value: string): string {
 
 export function mountApp(el: HTMLElement): void {
   root = el
+  root.addEventListener('click', (event) => {
+    if ((event.target as HTMLElement).closest('#header-settings')) goToSettings(location.hash || '#/')
+  })
   handleRedirect().then(route)
   window.addEventListener('hashchange', route)
 }
@@ -58,12 +69,13 @@ function route(): void {
   return renderStart()
 }
 
-const HEADER = `
+const header = (): string => `
     <header class="pg-header">
       <div class="pg-titlebar">
         <span class="pg-mark" aria-hidden="true"><span>?</span><span>?</span><span>?</span></span>
         <h1 class="pg-title">Phonogramm</h1>
       </div>
+      <button type="button" class="icon-btn" id="header-settings" aria-label="Einstellungen">${ICON_GEAR}</button>
     </header>`
 
 // Inline geometric icons (stroke-based, 2px). Decorative → aria-hidden.
@@ -84,9 +96,9 @@ const ICON_MAGNIFIER = `
     <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21" stroke-linecap="round"/>
   </svg>`
 const ICON_GEAR = `
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-    <circle cx="12" cy="12" r="3.4"/>
-    <path d="M12 1.5v3.2M12 19.3v3.2M1.5 12h3.2M19.3 12h3.2M4.4 4.4l2.3 2.3M17.3 17.3l2.3 2.3M19.6 4.4l-2.3 2.3M6.7 17.3l-2.3 2.3" stroke-linecap="round"/>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="3.2"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
   </svg>`
 const ICON_ARROW = `
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -146,7 +158,7 @@ const COLLAGE_ALBUM = `
 
 function renderStart(): void {
   render(root, `
-    ${HEADER}
+    ${header()}
     <div class="pg-hero-wrap">
       <div class="pg-hero" aria-hidden="true">
         <div class="pg-hero__lens">???</div>
@@ -184,9 +196,30 @@ async function startLogin(): Promise<void> {
   }
 }
 
+function deviceOptionHtml(device: SpotifyDevice, selectedId: string): string {
+  const label = device.name + (device.is_active ? ' (aktiv)' : '')
+  return `<option value="${escapeAttr(device.id)}" ${device.id === selectedId ? 'selected' : ''}>${escapeHtml(label)}</option>`
+}
+
+async function loadDeviceOptions(select: HTMLSelectElement): Promise<void> {
+  const token = getAccessToken()
+  if (!token) return
+  try {
+    const devices = await getDevices(token)
+    const selectedId = getDeviceId()
+    select.innerHTML = [
+      `<option value="">Automatisch (aktives Gerät)</option>`,
+      ...devices.map((d) => deviceOptionHtml(d, selectedId)),
+    ].join('')
+  } catch {
+    // Geräteliste ist optional — die Auto-Erkennung bleibt trotzdem nutzbar.
+  }
+}
+
 function renderSettings(): void {
   const mode = getMode()
   const clipMs = getClipMs()
+  const token = getAccessToken()
   render(root, `
     <h1 class="pg-screen-title">Einstellungen</h1>
     <div class="pg-hero-wrap">
@@ -219,6 +252,19 @@ function renderSettings(): void {
         `).join('')}
       </div>
     </fieldset>
+    ${token ? `
+    <hr class="divider" />
+    <div>
+      <p class="section-label section-label--blue">${ICON_DB} Wiedergabegerät</p>
+      <div class="field">
+        <label for="device-id">Spotify-Gerät</label>
+        <select id="device-id">
+          <option value="">Automatisch (aktives Gerät)</option>
+        </select>
+      </div>
+      <p class="hint">Falls mehrere Geräte gleichzeitig mit Spotify verbunden sind, kannst du hier festlegen, auf welchem die Ausschnitte abgespielt werden.</p>
+    </div>
+    ` : ''}
     <hr class="divider" />
     <div>
       <p class="section-label section-label--blue">${ICON_DB} API-Integration</p>
@@ -244,6 +290,14 @@ function renderSettings(): void {
   const clientIdInput = root.querySelector<HTMLInputElement>('#client-id')!
   clientIdInput.addEventListener('input', () => setClientId(clientIdInput.value))
   clientIdInput.addEventListener('change', () => setStatus('Client ID gespeichert.'))
+  const deviceSelect = root.querySelector<HTMLSelectElement>('#device-id')
+  if (deviceSelect) {
+    deviceSelect.addEventListener('change', () => {
+      setDeviceId(deviceSelect.value)
+      setStatus(deviceSelect.value === '' ? 'Automatische Geräteerkennung aktiviert.' : 'Wiedergabegerät gespeichert.')
+    })
+    void loadDeviceOptions(deviceSelect)
+  }
   root.querySelector('#back')!.addEventListener('click', () => (location.hash = settingsFrom))
 }
 
@@ -268,32 +322,26 @@ async function loadRound(token: string): Promise<boolean> {
 async function renderQuiz(): Promise<void> {
   const token = getAccessToken()
   if (!token) return void (location.hash = '#/')
-  const clipMs = getClipMs()
   render(root, `
-    ${HEADER}
-    <div class="quiz-bar">
-      <span class="quiz-bar__mode">Modus: ${MODE_LABELS[getMode()]} · ${clipMs / 1000}s</span>
-      <button type="button" class="icon-btn" id="quiz-settings" aria-label="Einstellungen anpassen">${ICON_GEAR}</button>
-    </div>
+    ${header()}
     <div class="player" id="player">
       <div class="pg-hero pg-hero--album" aria-hidden="true">
         ${COLLAGE_ALBUM}
         <div class="pg-hero__lens"><span class="pg-hero__play"></span></div>
       </div>
-      <div class="player__head">
-        <p class="player__caseno">Fall #???</p>
-        <p class="player__status">Status: Ermittlung läuft — ${clipMs / 1000}-Sek-Ausschnitt</p>
-      </div>
+      <p class="player__caseno">Fall #???</p>
       <div class="player__progress" aria-hidden="true">
         <span class="player__bar" id="progress"></span>
       </div>
       <div class="controls">
-        <button type="button" id="back10" aria-label="10 Sekunden zurück">${ICON_REWIND('10')}<span>−10s</span></button>
-        <button type="button" id="fwd10" aria-label="10 Sekunden vor">${ICON_FORWARD('10')}<span>+10s</span></button>
+        <button type="button" class="scrub" id="back10" aria-label="10 Sekunden zurück">${ICON_REWIND('10')}<span>−10s</span></button>
+        <button type="button" id="play"><span class="play-tri" aria-hidden="true"></span> Abspielen</button>
+        <button type="button" class="scrub" id="fwd10" aria-label="10 Sekunden vor">${ICON_FORWARD('10')}<span>+10s</span></button>
       </div>
-      <button type="button" id="play"><span class="play-tri" aria-hidden="true"></span> Abspielen</button>
-      <button type="button" id="skip">Andere Folge</button>
-      <button type="button" class="secondary" id="finish">Beenden</button>
+      <div class="player__actions">
+        <button type="button" id="skip">Andere Folge</button>
+        <button type="button" class="secondary" id="finish">Beenden</button>
+      </div>
     </div>
     <div class="answer">
       <h1 class="answer__q">Welcher Fall ist das?</h1>
@@ -315,7 +363,6 @@ async function renderQuiz(): Promise<void> {
   root.querySelector('#fwd10')!.addEventListener('click', () => void scrubAndPlay(10000))
   root.querySelector('#skip')!.addEventListener('click', () => void skipToOtherFolge())
   root.querySelector('#finish')!.addEventListener('click', renderSummary)
-  root.querySelector('#quiz-settings')!.addEventListener('click', () => goToSettings('#/quiz'))
   root.querySelector('#check')!.addEventListener('click', checkAnswer)
   root.querySelector<HTMLInputElement>('#guess')!.addEventListener('input', clearErrorOnInput)
   setStatus('Bereit. Tippe auf Abspielen.')
@@ -351,7 +398,10 @@ async function playCurrentClip(): Promise<void> {
   triggerProgress()
   setStatus('Wiedergabe läuft …')
   try {
-    await playClip(token, positionToClip(current.tracks, current.positionMs, clipMs), { clipMs })
+    await playClip(token, positionToClip(current.tracks, current.positionMs, clipMs), {
+      clipMs,
+      preferredDeviceId: getDeviceId() || undefined,
+    })
     setStatus('Fertig. Deine Antwort?')
   } catch (e) {
     setStatus(e instanceof NoActiveDeviceError
@@ -393,7 +443,7 @@ function renderResult(correct: boolean, nummer: number, titel: string, message: 
          </div>
        </div>`
   render(root, `
-    ${HEADER}
+    ${header()}
     <div class="result-verdict result-verdict--${correct ? 'ok' : 'no'}">
       <span class="result-verdict__icon" aria-hidden="true">${correct ? ICON_CHECK : ICON_CROSS}</span>
       <p class="result-headline">${headline}</p>
@@ -418,7 +468,7 @@ function renderSummary(): void {
   const total = session.correct + session.incorrect
   const percent = total === 0 ? 0 : Math.round((session.correct / total) * 100)
   render(root, `
-    ${HEADER}
+    ${header()}
     <h1 class="pg-screen-title">Zusammenfassung</h1>
     <div class="result-cards" aria-hidden="true">
       <div class="result-card result-card--no">
@@ -450,7 +500,9 @@ async function continueListening(): Promise<void> {
   const continueFrom = current.positionMs + getClipMs()
   setStatus('Wiedergabe läuft …')
   try {
-    await playFrom(token, positionToClip(current.tracks, continueFrom, getClipMs()))
+    await playFrom(token, positionToClip(current.tracks, continueFrom, getClipMs()), {
+      preferredDeviceId: getDeviceId() || undefined,
+    })
     setStatus('Läuft weiter in Spotify …')
   } catch (e) {
     setStatus(e instanceof NoActiveDeviceError

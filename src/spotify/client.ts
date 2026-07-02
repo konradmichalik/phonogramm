@@ -24,12 +24,26 @@ export async function getAlbumTracks(albumId: string, token: string): Promise<Tr
   return items.map((t) => ({ uri: t.uri, durationMs: t.duration_ms }))
 }
 
-export async function getActiveDeviceId(token: string): Promise<string | null> {
+export interface SpotifyDevice {
+  id: string
+  name: string
+  is_active: boolean
+}
+
+export async function getActiveDeviceId(token: string, preferredDeviceId?: string): Promise<string | null> {
   const res = await fetch(`${API}/me/player/devices`, { headers: authHeaders(token) })
   if (!res.ok) throw new Error(`Geräte laden fehlgeschlagen (${res.status})`)
   const data = (await res.json()) as { devices: Array<{ id: string; is_active: boolean }> }
+  if (preferredDeviceId && data.devices.some((d) => d.id === preferredDeviceId)) return preferredDeviceId
   const active = data.devices.find((d) => d.is_active) ?? data.devices[0]
   return active?.id ?? null
+}
+
+export async function getDevices(token: string): Promise<SpotifyDevice[]> {
+  const res = await fetch(`${API}/me/player/devices`, { headers: authHeaders(token) })
+  if (!res.ok) throw new Error(`Geräte laden fehlgeschlagen (${res.status})`)
+  const data = (await res.json()) as { devices: SpotifyDevice[] }
+  return data.devices
 }
 
 export async function playClipRequest(

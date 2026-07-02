@@ -1,5 +1,5 @@
 import { beforeEach, test, expect } from 'vitest'
-import { getClientId, getClipMs, getMode, setClientId, setClipMs, setMode } from '../src/state/settings'
+import { getClientId, getClipMs, getDeviceId, getMode, setClientId, setClipMs, setDeviceId, setMode } from '../src/state/settings'
 
 beforeEach(() => localStorage.clear())
 
@@ -49,4 +49,19 @@ test('getClipMs: Wert außerhalb der Presets -> Default 10000', () => {
 test('getClipMs: nicht-numerischer gespeicherter Wert -> Default 10000', () => {
   localStorage.setItem('phonogramm.clipMs', 'abc')
   expect(getClipMs()).toBe(10000)
+})
+
+test('getDeviceId: Default ist leerer String', () => {
+  expect(getDeviceId()).toBe('')
+})
+
+test('setDeviceId persistiert', () => {
+  setDeviceId('dev2')
+  expect(getDeviceId()).toBe('dev2')
+})
+
+test('setDeviceId mit leerem Wert entfernt gespeicherten Wert', () => {
+  setDeviceId('dev2')
+  setDeviceId('')
+  expect(getDeviceId()).toBe('')
 })

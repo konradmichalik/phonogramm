@@ -3,6 +3,7 @@ import { CLIP_MS, type Mode } from '../types'
 const KEY = 'phonogramm.mode'
 const CLIENT_ID_KEY = 'phonogramm.clientId'
 const CLIP_MS_KEY = 'phonogramm.clipMs'
+const DEVICE_ID_KEY = 'phonogramm.deviceId'
 
 export const CLIP_PRESETS_MS = [5000, 10000, 15000, 20000]
 
@@ -35,4 +36,16 @@ export function getClipMs(): number {
 
 export function setClipMs(ms: number): void {
   localStorage.setItem(CLIP_MS_KEY, String(ms))
+}
+
+export function getDeviceId(): string {
+  return localStorage.getItem(DEVICE_ID_KEY) ?? ''
+}
+
+export function setDeviceId(id: string): void {
+  if (id === '') {
+    localStorage.removeItem(DEVICE_ID_KEY)
+    return
+  }
+  localStorage.setItem(DEVICE_ID_KEY, id)
 }
