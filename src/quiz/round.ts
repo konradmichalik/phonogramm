@@ -1,6 +1,6 @@
 import { CLIP_MS, type Folge, type Mode, type Track } from '../types'
 import { pickRandomFolge } from './quizLogic'
-import { initialPosition, introEndMs } from './timeline'
+import { initialPosition } from './timeline'
 
 export interface StartRoundDeps {
   folgen: Folge[]
@@ -47,7 +47,7 @@ export async function startRound(deps: StartRoundDeps): Promise<Round> {
         mode: deps.mode,
         tracks: playable,
         rng: deps.rng,
-        startOffsetMs: introEndMs(folge.nummer),
+        startOffsetMs: (folge.startSeconds ?? 0) * 1000,
         clipMs: deps.clipMs ?? CLIP_MS,
       })
       return { folge, tracks: playable, positionMs }

@@ -278,6 +278,9 @@ function buildFolgen(albums) {
       nummer: parsed.nummer,
       titel: parsed.titel,
       albumId: album.albumId,
+      // Grober Startwert (Intro-Ende); pro Folge in folgen.json manuell feinjustierbar,
+      // da ältere Folgen einen Disclaimer und neuere einen Titelsong-Einzeltitel haben.
+      startSeconds: parsed.nummer <= 124 ? 42 : 49,
       ...(skipLeadingTracks > 0 ? { skipLeadingTracks } : {}),
       _trackCount: album.totalTracks ?? album.tracks.length,
     }

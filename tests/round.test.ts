@@ -1,7 +1,7 @@
 import { startRound } from '../src/quiz/round'
 import type { Folge, Track } from '../src/types'
 
-const folgen: Folge[] = [{ nummer: 5, titel: 'X', albumId: 'alb' }]
+const folgen: Folge[] = [{ nummer: 5, titel: 'X', albumId: 'alb', startSeconds: 42 }]
 const tracks: Track[] = [{ uri: 't0', durationMs: 60000 }]
 
 test('startRound liefert Folge + Tracks + positionMs', async () => {
@@ -14,7 +14,7 @@ test('startRound liefert Folge + Tracks + positionMs', async () => {
   })
   expect(round.folge.nummer).toBe(5)
   expect(round.tracks).toEqual(tracks)
-  expect(round.positionMs).toBe(42000) // Folge <= 124 -> Intro-Ende bei 42s
+  expect(round.positionMs).toBe(42000) // startSeconds: 42 -> Start bei 42s
 })
 
 test('startRound caches tracks by albumId', async () => {
@@ -108,7 +108,7 @@ test('startRound überspringt Album mit leerer Tracklist und versucht die nächs
 })
 
 test('startRound entfernt skipLeadingTracks führende Tracks (Spoiler-Inhaltsangabe)', async () => {
-  const skipFolgen: Folge[] = [{ nummer: 239, titel: 'Spoiler', albumId: 'skip-alb', skipLeadingTracks: 1 }]
+  const skipFolgen: Folge[] = [{ nummer: 239, titel: 'Spoiler', albumId: 'skip-alb', startSeconds: 49, skipLeadingTracks: 1 }]
   const t0: Track = { uri: 'synopsis-t0', durationMs: 30000 }
   const t1: Track = { uri: 't1', durationMs: 60000 }
   const t2: Track = { uri: 't2', durationMs: 60000 }
@@ -122,7 +122,7 @@ test('startRound entfernt skipLeadingTracks führende Tracks (Spoiler-Inhaltsang
   })
 
   expect(round.tracks).toEqual([t1, t2])
-  expect(round.positionMs).toBe(49000) // Folge 239 >= 125 -> Intro-Ende bei 49s, over sliced set berechnet
+  expect(round.positionMs).toBe(49000) // startSeconds: 49, über sliced Trackset berechnet
 })
 
 test('startRound lässt Tracks unverändert, wenn skipLeadingTracks fehlt', async () => {
@@ -140,12 +140,12 @@ test('startRound lässt Tracks unverändert, wenn skipLeadingTracks fehlt', asyn
   expect(round.tracks).toEqual(tracks)
 })
 
-test('startRound (Modus start): Folge <= 124 startet bei 42000ms (Intro-Ende)', async () => {
-  const earlyFolgen: Folge[] = [{ nummer: 42, titel: 'Früh', albumId: 'intro-early-alb' }]
+test('startRound (Modus start): nutzt startSeconds aus der Folge als Startposition', async () => {
+  const folgenMitStart: Folge[] = [{ nummer: 42, titel: 'Mit Startzeit', albumId: 'start-alb', startSeconds: 42 }]
   const longTrack: Track[] = [{ uri: 'long-t0', durationMs: 300000 }]
 
   const round = await startRound({
-    folgen: earlyFolgen,
+    folgen: folgenMitStart,
     mode: 'start',
     token: 'TOK',
     getAlbumTracks: async () => longTrack,
@@ -155,19 +155,19 @@ test('startRound (Modus start): Folge <= 124 startet bei 42000ms (Intro-Ende)', 
   expect(round.positionMs).toBe(42000)
 })
 
-test('startRound (Modus start): Folge >= 125 startet bei 49000ms (Intro-Ende)', async () => {
-  const lateFolgen: Folge[] = [{ nummer: 239, titel: 'Spät', albumId: 'intro-late-alb' }]
+test('startRound (Modus start): fällt auf 0 zurück, wenn startSeconds fehlt', async () => {
+  const folgenOhneStart: Folge[] = [{ nummer: 300, titel: 'Ohne Startzeit', albumId: 'no-start-alb' }]
   const longTrack: Track[] = [{ uri: 'long-t0', durationMs: 300000 }]
 
   const round = await startRound({
-    folgen: lateFolgen,
+    folgen: folgenOhneStart,
     mode: 'start',
     token: 'TOK',
     getAlbumTracks: async () => longTrack,
     rng: () => 0,
   })
 
-  expect(round.positionMs).toBe(49000)
+  expect(round.positionMs).toBe(0)
 })
 
 test('startRound behandelt skipLeadingTracks >= Trackanzahl als Ladefehler und versucht die nächste Folge', async () => {

@@ -1,4 +1,4 @@
-import { totalDurationMs, initialPosition, scrub, positionToClip, introEndMs } from '../src/quiz/timeline'
+import { totalDurationMs, initialPosition, scrub, positionToClip } from '../src/quiz/timeline'
 import { CLIP_MS } from '../src/types'
 import type { Track } from '../src/types'
 
@@ -11,22 +11,6 @@ const A: Track[] = [
 
 test('totalDurationMs summiert alle Track-Dauern', () => {
   expect(totalDurationMs(A)).toBe(330000)
-})
-
-test('introEndMs: 42s für Folge 1', () => {
-  expect(introEndMs(1)).toBe(42000)
-})
-
-test('introEndMs: 42s für Folge 124 (Grenze)', () => {
-  expect(introEndMs(124)).toBe(42000)
-})
-
-test('introEndMs: 49s für Folge 125 (Grenze)', () => {
-  expect(introEndMs(125)).toBe(49000)
-})
-
-test('introEndMs: 49s für Folge 239', () => {
-  expect(introEndMs(239)).toBe(49000)
 })
 
 test('initialPosition start: ohne startOffsetMs weiterhin 0 (backward-compat)', () => {
