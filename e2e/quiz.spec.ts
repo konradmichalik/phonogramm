@@ -12,8 +12,8 @@ async function mockSpotify(page: import('@playwright/test').Page): Promise<void>
 async function seedTokenAndGoToQuiz(page: import('@playwright/test').Page): Promise<void> {
   await page.goto('./')
   await page.evaluate(() => {
-    sessionStorage.setItem('hq.token', 'TOK')
-    sessionStorage.setItem('hq.expires', String(Date.now() + 3_600_000))
+    sessionStorage.setItem('phonogramm.token', 'TOK')
+    sessionStorage.setItem('phonogramm.expires', String(Date.now() + 3_600_000))
   })
   await page.goto('./#/quiz')
 }
@@ -67,4 +67,43 @@ test('Andere Folge lädt eine neue Runde', async ({ page }) => {
   await tracksRequest
 
   await expect(page.locator('#play')).toBeVisible()
+})
+
+test('Beenden zeigt eine Zusammenfassung mit Richtig/Falsch-Zählung', async ({ page }) => {
+  await mockSpotify(page)
+  await page.addInitScript(() => {
+    Math.random = () => 0
+  })
+
+  await seedTokenAndGoToQuiz(page)
+  await expect(page.locator('#play')).toBeVisible()
+
+  // Runde 1: rng()===0 wählt deterministisch Folge 1 → richtig beantworten.
+  await page.fill('#guess', '1')
+  await page.click('#check')
+  await expect(page.locator('.result-headline')).toHaveText('Richtig')
+
+  const tracksRequest = page.waitForRequest('**/v1/albums/**/tracks**')
+  await page.click('#next')
+  await tracksRequest
+
+  // Runde 2: Folge 1 ist jetzt ausgeschlossen → rng()===0 wählt Folge 2 → falsch beantworten.
+  await page.fill('#guess', '999')
+  await page.click('#check')
+  await expect(page.locator('.result-headline')).toHaveText('Leider nicht')
+
+  await page.click('#finish')
+
+  await expect(page.getByText('1 von 2 richtig · 50%')).toBeVisible()
+})
+
+test('Beenden auf dem Quiz-Screen zeigt eine leere Zusammenfassung', async ({ page }) => {
+  await mockSpotify(page)
+
+  await seedTokenAndGoToQuiz(page)
+  await expect(page.locator('#play')).toBeVisible()
+
+  await page.click('#finish')
+
+  await expect(page.getByText('Keine Runde gespielt.')).toBeVisible()
 })

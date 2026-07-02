@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ??? Hörspiel-Quiz — "Fall-Akte" / Case-File
+   ??? Phonogramm — "Fall-Akte" / Case-File
    Constructivist minimalism, high-contrast. Sharp edges (0 radius),
    tonal layers + 1px lines + left-edge colored accent bars ("evidence blocks").
    Display: Anton (all-caps). Body/UI: Hanken Grotesk. Self-hosted via Fontsource.
@@ -80,7 +80,7 @@ body {
 
 /* --- Header --------------------------------------------------------------- */
 
-.hq-header {
+.pg-header {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -88,7 +88,7 @@ body {
   border-bottom: 1px solid var(--outline-variant);
 }
 
-.hq-titlebar {
+.pg-titlebar {
   display: flex;
   align-items: baseline;
   gap: 12px;
@@ -96,7 +96,7 @@ body {
 }
 
 /* Tricolor ??? mark (own mark — NOT the franchise wordmark) */
-.hq-mark {
+.pg-mark {
   font-family: var(--font-display);
   font-size: 2rem;
   line-height: 1;
@@ -104,11 +104,11 @@ body {
   margin: 0;
   display: inline-flex;
 }
-.hq-mark span:nth-child(1) { color: var(--white); }
-.hq-mark span:nth-child(2) { color: var(--red); }
-.hq-mark span:nth-child(3) { color: var(--blue); }
+.pg-mark span:nth-child(1) { color: var(--white); }
+.pg-mark span:nth-child(2) { color: var(--red); }
+.pg-mark span:nth-child(3) { color: var(--blue); }
 
-.hq-title {
+.pg-title {
   font-family: var(--font-display);
   font-size: 2rem;
   line-height: 1;
@@ -118,7 +118,7 @@ body {
   margin: 0;
 }
 
-.hq-sub {
+.pg-sub {
   color: var(--on-surface-variant);
   font-size: 0.82rem;
   font-weight: 700;
@@ -129,7 +129,7 @@ body {
 }
 
 /* Section titles on inner screens (Anton, all-caps) */
-.hq-screen-title {
+.pg-screen-title {
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 10vw, 3rem);
   line-height: 0.95;
@@ -138,11 +138,11 @@ body {
   color: var(--white);
   margin: 0;
 }
-.hq-screen-title .accent { color: var(--red-text); }
+.pg-screen-title .accent { color: var(--red-text); }
 
 /* --- Hero case-circles (CSS geometry, decorative) ------------------------- */
 
-.hq-hero {
+.pg-hero {
   position: relative;
   align-self: center;
   width: min(78vw, 260px);
@@ -154,7 +154,7 @@ body {
   flex: 0 0 auto;
 }
 /* Constructivist collage: triangles + stripes + red arc */
-.hq-hero::before {
+.pg-hero::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -165,7 +165,7 @@ body {
   clip-path: circle(50%);
 }
 /* triangle wedge */
-.hq-hero::after {
+.pg-hero::after {
   content: '';
   position: absolute;
   left: -6%;
@@ -178,7 +178,7 @@ body {
 }
 
 /* Central white magnifier with ??? motif */
-.hq-hero__lens {
+.pg-hero__lens {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -196,7 +196,7 @@ body {
   letter-spacing: 0.04em;
   color: var(--white);
 }
-.hq-hero__lens::after { /* magnifier handle */
+.pg-hero__lens::after { /* magnifier handle */
   content: '';
   position: absolute;
   right: -22%;
@@ -208,20 +208,26 @@ body {
   transform-origin: left center;
 }
 
-/* Album variant (player) — red-dominant collage, triangle play glyph */
-.hq-hero--album { border-color: var(--outline); width: min(52vw, 190px); height: min(52vw, 190px); }
-.hq-hero--album::before {
-  background-image:
-    linear-gradient(45deg, var(--red) 0 30%, transparent 30%),
-    linear-gradient(-45deg, var(--blue) 0 26%, transparent 26%),
-    repeating-linear-gradient(0deg, transparent 0 18px, rgba(255, 255, 255, 0.05) 18px 20px);
+/* Album variant (player) — constructivist grid collage (SVG), nod to the ??? mark */
+.pg-hero--album { border-color: var(--blue); width: min(52vw, 190px); height: min(52vw, 190px); }
+/* SVG collage replaces the gradient collage + generic corner triangle here */
+.pg-hero--album::before { content: none; }
+.pg-hero--album::after { content: none; }
+.pg-hero--album .pg-hero__lens::after { content: none; } /* play disc: no magnifier handle */
+.pg-hero__collage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
-.hq-hero--album .hq-hero__lens {
+.pg-hero--album .pg-hero__lens {
   border-color: var(--white);
-  background: rgba(13, 13, 13, 0.7);
+  background: rgba(13, 13, 13, 0.62);
+  z-index: 1;
 }
 /* triangle "play" glyph inside lens */
-.hq-hero__play {
+.pg-hero__play {
   width: 0;
   height: 0;
   border-top: 16px solid transparent;
@@ -231,11 +237,11 @@ body {
 }
 
 /* Gear variant (settings) */
-.hq-hero--gear { width: min(40vw, 140px); height: min(40vw, 140px); }
-.hq-hero--gear .hq-hero__lens { border-color: var(--blue); color: var(--blue); }
+.pg-hero--gear { width: min(40vw, 140px); height: min(40vw, 140px); }
+.pg-hero--gear .pg-hero__lens { border-color: var(--blue); color: var(--blue); }
 
 /* Rotated red evidence tag ("FALL: ???") */
-.hq-tag {
+.pg-tag {
   position: absolute;
   top: 6%;
   right: -4px;
@@ -250,7 +256,7 @@ body {
   z-index: 2;
 }
 
-.hq-hero-wrap { position: relative; align-self: center; }
+.pg-hero-wrap { position: relative; align-self: center; }
 
 /* --- Buttons -------------------------------------------------------------- */
 
@@ -300,6 +306,33 @@ button:active { transform: scale(0.98); }
 
 /* icon inside buttons */
 button svg { flex: 0 0 auto; }
+
+/* Compact icon button — overrides the full-width default */
+.icon-btn {
+  width: auto;
+  min-width: var(--tap);
+  padding: 0 14px;
+  background: transparent;
+  color: var(--white);
+  border: 2px solid var(--outline);
+}
+.icon-btn:hover, .icon-btn:focus-visible { border-color: var(--white); }
+
+/* --- Quiz top bar — current mode + settings shortcut --------------------- */
+.quiz-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.quiz-bar__mode {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
 
 /* --- Player card (evidence block, blue left accent) ----------------------- */
 
@@ -356,9 +389,9 @@ button svg { flex: 0 0 auto; }
    Duration comes from the --clip-ms custom property, set by app.ts from
    CLIP_MS (src/types.ts) — stays in sync if CLIP_MS changes again. */
 .player.is-playing .player__bar {
-  animation: hq-progress var(--clip-ms, 10s) linear forwards;
+  animation: pg-progress var(--clip-ms, 10s) linear forwards;
 }
-@keyframes hq-progress {
+@keyframes pg-progress {
   from { width: 0; }
   to   { width: 100%; }
 }
@@ -451,32 +484,34 @@ label {
 
 #guess {
   width: 100%;
-  min-height: 56px;
+  min-height: 104px;
   padding: 8px 0;
   font-family: var(--font-display);
-  font-size: 1.9rem;
-  letter-spacing: 0.04em;
+  font-size: clamp(3rem, 15vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-align: center;
   color: var(--white);
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--white);
+  border-bottom: 2px solid var(--white);
   border-radius: 0;
   outline: none;
   transition: border-color 0.18s ease;
 }
 #guess::placeholder {
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  letter-spacing: normal;
-  color: var(--outline);
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 15vw, 4.5rem);
+  letter-spacing: 0.12em;
+  color: var(--outline-variant);
 }
-#guess:focus { border-bottom: 2px solid var(--red); }
+#guess:focus { border-bottom: 3px solid var(--red); }
 
-/* red "NUMMER" label pinned right of the input */
+/* red "NUMMER" label pinned bottom-right of the input */
 .field__tag {
   position: absolute;
   right: 0;
-  bottom: 16px;
+  bottom: 12px;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.82rem;
@@ -660,6 +695,21 @@ legend { padding: 0; }
 
 /* --- Result --------------------------------------------------------------- */
 
+.result-verdict {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.result-verdict__icon {
+  display: inline-flex;
+  width: clamp(64px, 22vw, 104px);
+  height: clamp(64px, 22vw, 104px);
+}
+.result-verdict__icon svg { width: 100%; height: 100%; }
+.result-verdict--ok .result-verdict__icon { color: var(--blue); }
+.result-verdict--no .result-verdict__icon { color: var(--red); }
+
 .result-headline {
   font-family: var(--font-display);
   font-size: clamp(3rem, 16vw, 4.5rem);
@@ -670,6 +720,7 @@ legend { padding: 0; }
   text-align: center;
   margin: 8px 0;
 }
+.result-verdict .result-headline { margin: 0; }
 
 /* Case-identification blocks */
 .result-cards {
@@ -748,7 +799,7 @@ a:focus-visible {
   #app > * {
     opacity: 0;
     transform: translateY(10px);
-    animation: hq-reveal 0.5s var(--ease) forwards;
+    animation: pg-reveal 0.5s var(--ease) forwards;
   }
   #app > *:nth-child(1) { animation-delay: 0.04s; }
   #app > *:nth-child(2) { animation-delay: 0.10s; }
@@ -758,7 +809,7 @@ a:focus-visible {
   #app > *:nth-child(6) { animation-delay: 0.34s; }
   #app > *:nth-child(7) { animation-delay: 0.40s; }
 
-  @keyframes hq-reveal {
+  @keyframes pg-reveal {
     to { opacity: 1; transform: translateY(0); }
   }
 }

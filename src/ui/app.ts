@@ -2,11 +2,12 @@ import folgenJson from '../data/folgen.json'
 import { parseFolgenData } from '../data/folgenSchema'
 import { beginLogin, exchangeCodeForToken, getAccessToken, getSpotifyConfig } from '../auth/spotifyAuth'
 import { getAlbumTracks, NoActiveDeviceError } from '../spotify/client'
-import { playClip } from '../spotify/playback'
+import { playClip, playFrom } from '../spotify/playback'
 import { startRound, type Round } from '../quiz/round'
 import { evaluateAnswer } from '../quiz/quizLogic'
 import { positionToClip, scrub } from '../quiz/timeline'
 import { validateGuess } from '../quiz/validateGuess'
+import { createSession, recordResult, type Session } from '../quiz/session'
 import { CLIP_PRESETS_MS, getClientId, getClipMs, getMode, setClientId, setClipMs, setMode } from '../state/settings'
 import { render, setStatus } from './render'
 
@@ -14,6 +15,15 @@ const data = parseFolgenData(folgenJson)
 let root: HTMLElement
 let current: Round | null = null
 let lastAlbumId: string | null = null
+let settingsFrom = '#/'
+let session: Session = createSession()
+
+const MODE_LABELS = { start: 'Normal', random: 'Advanced' } as const
+
+function goToSettings(from: string): void {
+  settingsFrom = from
+  location.hash = '#/settings'
+}
 
 function escapeAttr(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
@@ -49,10 +59,10 @@ function route(): void {
 }
 
 const HEADER = `
-    <header class="hq-header">
-      <div class="hq-titlebar">
-        <span class="hq-mark" aria-hidden="true"><span>?</span><span>?</span><span>?</span></span>
-        <h1 class="hq-title">Hörspiel-Quiz</h1>
+    <header class="pg-header">
+      <div class="pg-titlebar">
+        <span class="pg-mark" aria-hidden="true"><span>?</span><span>?</span><span>?</span></span>
+        <h1 class="pg-title">Phonogramm</h1>
       </div>
     </header>`
 
@@ -82,6 +92,10 @@ const ICON_ARROW = `
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`
+const ICON_PLAY = `
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5v14l11-7z"/>
+  </svg>`
 const ICON_KEY = `
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <circle cx="8" cy="8" r="4"/><path d="M10.8 10.8 20 20M17 17l2-2M15 15l2-2" stroke-linecap="round"/>
@@ -95,32 +109,67 @@ const ICON_DB = `
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v14c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>
   </svg>`
+const ICON_CHECK = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-7" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`
+const ICON_CROSS = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/><path d="m8.5 8.5 7 7M15.5 8.5l-7 7" stroke-linecap="round"/>
+  </svg>`
+// Constructivist grid collage for the album hero — nod to the "Die drei ???" mark.
+// Black-dominant 4×4 grid with red/blue/white geometric cells; the play lens sits on top.
+const COLLAGE_ALBUM = `
+  <svg class="pg-hero__collage" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="100" height="100" fill="#101010"/>
+    <polygon points="0,0 25,0 0,25" fill="#00aeef"/>
+    <polygon points="100,0 75,0 100,25" fill="#e6192e"/>
+    <polygon points="0,100 0,75 25,100" fill="#e6192e"/>
+    <polygon points="100,100 100,75 75,100" fill="#00aeef"/>
+    <rect x="25" y="0" width="25" height="25" fill="#e6192e"/>
+    <rect x="50" y="0" width="25" height="25" fill="#00aeef"/>
+    <rect x="0" y="25" width="25" height="25" fill="#e6192e"/>
+    <rect x="75" y="25" width="25" height="25" fill="#00aeef"/>
+    <rect x="0" y="50" width="25" height="25" fill="#00aeef"/>
+    <rect x="75" y="50" width="25" height="25" fill="#e6192e"/>
+    <rect x="25" y="75" width="25" height="25" fill="#00aeef"/>
+    <rect x="50" y="75" width="25" height="25" fill="#e6192e"/>
+    <polygon points="25,25 50,25 25,50" fill="#ffffff"/>
+    <polygon points="75,75 75,50 50,75" fill="#ffffff"/>
+    <circle cx="87.5" cy="12.5" r="7" fill="#101010"/>
+    <g fill="#e6192e">
+      <rect x="52.5" y="50" width="3" height="25"/>
+      <rect x="60" y="50" width="3" height="25"/>
+      <rect x="67.5" y="50" width="3" height="25"/>
+    </g>
+  </svg>`
 
 function renderStart(): void {
   render(root, `
     ${HEADER}
-    <div class="hq-hero-wrap">
-      <div class="hq-hero" aria-hidden="true">
-        <div class="hq-hero__lens">???</div>
+    <div class="pg-hero-wrap">
+      <div class="pg-hero" aria-hidden="true">
+        <div class="pg-hero__lens">???</div>
       </div>
-      <span class="hq-tag" aria-hidden="true">Fall: 001</span>
+      <span class="pg-tag" aria-hidden="true">Fall: 001</span>
     </div>
-    <p class="hq-sub">Untersuche die Fälle. Errate die Folge an einem kurzen Ausschnitt.</p>
+    <p class="pg-sub">Untersuche die Fälle. Errate die Folge an einem kurzen Ausschnitt.</p>
     <div class="stack">
       <button type="button" id="start">Neues Quiz ${ICON_ARROW}</button>
       <button type="button" class="secondary" id="settings">${ICON_GEAR} Einstellungen</button>
     </div>
     <div id="status" class="status" role="status" aria-live="polite"></div>
   `)
-  root.querySelector('#settings')!.addEventListener('click', () => (location.hash = '#/settings'))
+  root.querySelector('#settings')!.addEventListener('click', () => goToSettings('#/'))
   root.querySelector('#start')!.addEventListener('click', () => {
+    session = createSession()
     if (getAccessToken()) {
       location.hash = '#/quiz'
       return
     }
     if (getSpotifyConfig().clientId === '') {
       setStatus('Keine Spotify Client ID hinterlegt — bitte trage sie in den Einstellungen ein.', true)
-      location.hash = '#/settings'
+      goToSettings('#/')
       return
     }
     void startLogin()
@@ -139,10 +188,10 @@ function renderSettings(): void {
   const mode = getMode()
   const clipMs = getClipMs()
   render(root, `
-    <h1 class="hq-screen-title">Einstellungen</h1>
-    <div class="hq-hero-wrap">
-      <div class="hq-hero hq-hero--gear" aria-hidden="true">
-        <div class="hq-hero__lens">${ICON_GEAR}</div>
+    <h1 class="pg-screen-title">Einstellungen</h1>
+    <div class="pg-hero-wrap">
+      <div class="pg-hero pg-hero--gear" aria-hidden="true">
+        <div class="pg-hero__lens">${ICON_GEAR}</div>
       </div>
     </div>
     <fieldset>
@@ -195,7 +244,7 @@ function renderSettings(): void {
   const clientIdInput = root.querySelector<HTMLInputElement>('#client-id')!
   clientIdInput.addEventListener('input', () => setClientId(clientIdInput.value))
   clientIdInput.addEventListener('change', () => setStatus('Client ID gespeichert.'))
-  root.querySelector('#back')!.addEventListener('click', () => (location.hash = '#/'))
+  root.querySelector('#back')!.addEventListener('click', () => (location.hash = settingsFrom))
 }
 
 async function loadRound(token: string): Promise<boolean> {
@@ -222,9 +271,14 @@ async function renderQuiz(): Promise<void> {
   const clipMs = getClipMs()
   render(root, `
     ${HEADER}
+    <div class="quiz-bar">
+      <span class="quiz-bar__mode">Modus: ${MODE_LABELS[getMode()]} · ${clipMs / 1000}s</span>
+      <button type="button" class="icon-btn" id="quiz-settings" aria-label="Einstellungen anpassen">${ICON_GEAR}</button>
+    </div>
     <div class="player" id="player">
-      <div class="hq-hero hq-hero--album" aria-hidden="true">
-        <div class="hq-hero__lens"><span class="hq-hero__play"></span></div>
+      <div class="pg-hero pg-hero--album" aria-hidden="true">
+        ${COLLAGE_ALBUM}
+        <div class="pg-hero__lens"><span class="pg-hero__play"></span></div>
       </div>
       <div class="player__head">
         <p class="player__caseno">Fall #???</p>
@@ -239,12 +293,13 @@ async function renderQuiz(): Promise<void> {
       </div>
       <button type="button" id="play"><span class="play-tri" aria-hidden="true"></span> Abspielen</button>
       <button type="button" id="skip">Andere Folge</button>
+      <button type="button" class="secondary" id="finish">Beenden</button>
     </div>
     <div class="answer">
       <h1 class="answer__q">Welcher Fall ist das?</h1>
       <div class="field">
         <label for="guess">Folgennummer</label>
-        <input type="text" inputmode="numeric" maxlength="3" id="guess" placeholder="Fallnummer eingeben …" autocomplete="off" />
+        <input type="text" inputmode="numeric" maxlength="3" id="guess" placeholder="000" aria-label="Folgennummer, maximal drei Ziffern" autocomplete="off" />
         <span class="field__tag" aria-hidden="true">Nummer</span>
       </div>
       <button type="button" id="check">${ICON_MAGNIFIER} Antwort prüfen</button>
@@ -259,6 +314,8 @@ async function renderQuiz(): Promise<void> {
   root.querySelector('#back10')!.addEventListener('click', () => void scrubAndPlay(-10000))
   root.querySelector('#fwd10')!.addEventListener('click', () => void scrubAndPlay(10000))
   root.querySelector('#skip')!.addEventListener('click', () => void skipToOtherFolge())
+  root.querySelector('#finish')!.addEventListener('click', renderSummary)
+  root.querySelector('#quiz-settings')!.addEventListener('click', () => goToSettings('#/quiz'))
   root.querySelector('#check')!.addEventListener('click', checkAnswer)
   root.querySelector<HTMLInputElement>('#guess')!.addEventListener('input', clearErrorOnInput)
   setStatus('Bereit. Tippe auf Abspielen.')
@@ -319,6 +376,7 @@ function checkAnswer(): void {
   const result = validateGuess(raw)
   if (!result.valid) return setStatus(result.error, true)
   const evalResult = evaluateAnswer(result.value, current.folge)
+  session = recordResult(session, evalResult.correct)
   renderResult(evalResult.correct, current.folge.nummer, current.folge.titel, evalResult.message)
 }
 
@@ -336,14 +394,67 @@ function renderResult(correct: boolean, nummer: number, titel: string, message: 
        </div>`
   render(root, `
     ${HEADER}
-    <p class="result-headline">${headline}</p>
+    <div class="result-verdict result-verdict--${correct ? 'ok' : 'no'}">
+      <span class="result-verdict__icon" aria-hidden="true">${correct ? ICON_CHECK : ICON_CROSS}</span>
+      <p class="result-headline">${headline}</p>
+    </div>
     ${cards}
     <div class="result">${escapeHtml(message)}</div>
     <div class="stack">
+      <button type="button" class="secondary" id="listen">${ICON_PLAY} Weiterhören</button>
       <button type="button" id="next">Nächstes Quiz ${ICON_ARROW}</button>
+      <button type="button" class="secondary" id="finish">Beenden</button>
+      <button type="button" class="secondary" id="home">Startseite</button>
+    </div>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  `)
+  root.querySelector('#listen')!.addEventListener('click', () => void continueListening())
+  root.querySelector('#next')!.addEventListener('click', () => void renderQuiz())
+  root.querySelector('#finish')!.addEventListener('click', renderSummary)
+  root.querySelector('#home')!.addEventListener('click', () => (location.hash = '#/'))
+}
+
+function renderSummary(): void {
+  const total = session.correct + session.incorrect
+  const percent = total === 0 ? 0 : Math.round((session.correct / total) * 100)
+  render(root, `
+    ${HEADER}
+    <h1 class="pg-screen-title">Zusammenfassung</h1>
+    <div class="result-cards" aria-hidden="true">
+      <div class="result-card result-card--no">
+        <span class="result-card__label">Richtig</span>
+        <span class="result-card__no">${session.correct}</span>
+      </div>
+      <div class="result-card result-card--no">
+        <span class="result-card__label">Falsch</span>
+        <span class="result-card__no">${session.incorrect}</span>
+      </div>
+    </div>
+    <p class="result">${total === 0 ? 'Keine Runde gespielt.' : `${session.correct} von ${total} richtig · ${percent}%`}</p>
+    <div class="stack">
+      <button type="button" id="restart">Neues Quiz ${ICON_ARROW}</button>
       <button type="button" class="secondary" id="home">Startseite</button>
     </div>
   `)
-  root.querySelector('#next')!.addEventListener('click', () => void renderQuiz())
+  root.querySelector('#restart')!.addEventListener('click', () => {
+    session = createSession()
+    void renderQuiz()
+  })
   root.querySelector('#home')!.addEventListener('click', () => (location.hash = '#/'))
+}
+
+async function continueListening(): Promise<void> {
+  if (!current) return
+  const token = getAccessToken()
+  if (!token) return
+  const continueFrom = current.positionMs + getClipMs()
+  setStatus('Wiedergabe läuft …')
+  try {
+    await playFrom(token, positionToClip(current.tracks, continueFrom, getClipMs()))
+    setStatus('Läuft weiter in Spotify …')
+  } catch (e) {
+    setStatus(e instanceof NoActiveDeviceError
+      ? 'Bitte öffne die Spotify-App auf deinem Handy.'
+      : 'Wiedergabe fehlgeschlagen.', true)
+  }
 }
