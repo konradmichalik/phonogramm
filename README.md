@@ -1,4 +1,4 @@
-# 🎧 Hörspiel-Quiz
+# 🎧 Phonogramm
 
 Ein browserbasiertes Quiz für Hörspielfans: Es spielt einen exakten 10-Sekunden-Ausschnitt
 aus einer Folge und du musst erraten, um welche Folge es sich handelt.
@@ -17,7 +17,8 @@ spielt den Ausschnitt exakt 10 Sekunden lang ab und pausiert danach automatisch 
 
 ## Spielmodi
 
-- **Modus 1 – Folgenbeginn**: Der Ausschnitt startet kurz nach dem Intro der Folge.
+- **Modus 1 – Folgenbeginn**: Der Ausschnitt startet kurz nach dem Intro der Folge. Die
+  genaue Startzeit ist pro Folge über `startSeconds` in `src/data/folgen.json` einstellbar.
 - **Modus 2 – Zufälliger Ausschnitt**: Der Ausschnitt startet an einer zufälligen Stelle
   aus der Mitte der Folge.
 
@@ -43,11 +44,11 @@ VITE_SPOTIFY_CLIENT_ID=deine_spotify_client_id
    `VITE_SPOTIFY_CLIENT_ID` eintragen. Ein Client Secret wird **nicht** benötigt — die App
    nutzt OAuth Authorization Code Flow mit PKCE.
 3. Unter „Redirect URIs" folgende URIs registrieren:
-   - **Lokal:** `http://127.0.0.1:5173/hoerspiel-quiz/`
+   - **Lokal:** `http://127.0.0.1:5173/phonogramm/`
      Spotify erlaubt seit einiger Zeit kein `http://localhost` mehr als Redirect-URI,
      sondern nur noch die Loopback-IP `127.0.0.1`. Den Dev-Server deshalb explizit über
-     `http://127.0.0.1:5173/hoerspiel-quiz/` öffnen, nicht über `localhost`.
-   - **Produktion:** `https://<dein-github-user>.github.io/hoerspiel-quiz/`
+     `http://127.0.0.1:5173/phonogramm/` öffnen, nicht über `localhost`.
+   - **Produktion:** `https://<dein-github-user>.github.io/phonogramm/`
 
 ## Befehle
 
@@ -67,7 +68,7 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 ```json
 {
   "folgen": [
-    { "nummer": 239, "titel": "Das Geheimnis der sieben Palmen", "albumId": "<echte Spotify-Album-ID>", "skipLeadingTracks": 1 }
+    { "nummer": 239, "titel": "Das Geheimnis der sieben Palmen", "albumId": "<echte Spotify-Album-ID>", "startSeconds": 49, "skipLeadingTracks": 1 }
   ]
 }
 ```
@@ -75,6 +76,11 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 - `albumId`: Spotify-Album-ID der jeweiligen Hörspielfolge (zu finden über „Link teilen" →
   „Album-Link kopieren" in Spotify).
 - `titel` / `nummer`: Anzeigename und Folgennummer für die Auflösung im Quiz.
+- `startSeconds` (optional, Standard `0`): Startsekunde für Modus 1 (Folgenbeginn), gemessen
+  ab Beginn des spielbaren Zeitstrahls (also nach `skipLeadingTracks`). Grober Richtwert ist
+  das Intro-Ende (~42 s für Folgen 1–124, ~49 s ab Folge 125); da ältere Folgen zusätzlich
+  einen Disclaimer und neuere einen Titelsong als Einzeltitel haben, lässt sich der Wert pro
+  Folge exakt justieren.
 - `skipLeadingTracks` (optional, Standard `0`): Entfernt die ersten N Tracks aus dem
   spielbaren Zeitstrahl (betrifft beide Modi) — etwa eine „Inhaltsangabe"-Spur, die Folgennummer
   und Titel bereits verrät. Den passenden Wert per Blick in die Tracklist des Albums bei
@@ -85,7 +91,9 @@ durch echte Spotify-Album-IDs ersetzt werden müssen:
 Statt die Einträge manuell zu pflegen, kann `src/data/folgen.json` aus dem kompletten
 Alben-Katalog des Spotify-Künstlers „Die drei ???" generiert werden. Das Skript sucht den
 Künstler automatisch, listet alle seine Alben, leitet Folgennummer/Titel aus jedem Albumnamen ab
-und erkennt eine führende „Inhaltsangabe"-Spur automatisch als `skipLeadingTracks`. Der
+und erkennt eine führende „Inhaltsangabe"-Spur automatisch als `skipLeadingTracks`. Zusätzlich
+setzt es `startSeconds` auf den groben Intro-Richtwert (42 s bzw. 49 s), der anschließend pro
+Folge feinjustiert werden kann. Der
 Künstler-Katalog wird bewusst statt einer Playlist verwendet, da Lesezugriffe auf fremde
 öffentliche Playlists mit dem App-Token HTTP 403 liefern können — Künstler/Alben-Endpunkte
 funktionieren mit demselben Token zuverlässig.
@@ -113,13 +121,13 @@ anschließend manuell in die JSON-Datei ergänzt werden.
 Das Projekt wird über `.github/workflows/deploy.yml` automatisch bei jedem Push auf `main`
 gebaut und auf GitHub Pages veröffentlicht. Einmalig einzurichten:
 
-1. GitHub-Repository unter dem Namen **`hoerspiel-quiz`** anlegen (der Vite-`base`-Pfad
-   `/hoerspiel-quiz/` in `vite.config.ts` geht von diesem Namen aus). Heißt das Repo anders,
+1. GitHub-Repository unter dem Namen **`phonogramm`** anlegen (der Vite-`base`-Pfad
+   `/phonogramm/` in `vite.config.ts` geht von diesem Namen aus). Heißt das Repo anders,
    muss `base` entsprechend angepasst werden.
 2. Unter **Settings → Secrets and variables → Actions → Variables** eine Repository-Variable
    `SPOTIFY_CLIENT_ID` mit der eigenen Spotify-Client-ID anlegen. Der Workflow reicht sie
    beim Build als `VITE_SPOTIFY_CLIENT_ID` durch — sie wird nie im Repository gespeichert.
 3. Unter **Settings → Pages** als Quelle **„GitHub Actions"** auswählen.
 4. Nach dem ersten erfolgreichen Deploy ist die App unter
-   `https://<dein-github-user>.github.io/hoerspiel-quiz/` erreichbar. Diese URL muss wie
+   `https://<dein-github-user>.github.io/phonogramm/` erreichbar. Diese URL muss wie
    oben beschrieben auch als Redirect-URI im Spotify Dashboard hinterlegt sein.
